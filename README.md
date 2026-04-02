@@ -1,9 +1,8 @@
 ﻿V2.0.0: Enhanced encryption. Each pixel block will not only be rearranged but also undergo different flipping operations after encryption, improving encryption security.
-(Note: Encryption/decryption results are incompatible with V1.0.0.)
 
-V2.0.0: 强化加密,每个像素块在加密后除了会重新排列外还会执行不同的翻转处理，提升加密安全性.(注:加密/解密的结果与V1.0.0不兼容).
+V2.0.0: 强化加密,每个像素块在加密后除了会重新排列外还会执行不同的翻转处理，提升加密安全性.
 
-V2.0.0: 暗号化を強化。各ピクセルブロックは暗号化後、並び替えに加えて異なる反転処理が実行され、暗号化の安全性が向上します。（注：暗号化・復号化の結果は V1.0.0 と互換性がありません。）
+V2.0.0: 暗号化を強化。各ピクセルブロックは暗号化後、並び替えに加えて異なる反転処理が実行され、暗号化の安全性が向上します。
 
 # Image-Mosaic-Encryption-and-Decryption-Tool-
 
