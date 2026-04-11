@@ -1,0 +1,1407 @@
+﻿﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片马赛克加密解密工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 500px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        #decryptBtn {
+            background-color: #10a704;
+        }
+        #decryptBtn:hover {
+            background-color: #10741d;
+        }
+        .clear-all-btn {
+            background-color: #6c757d;
+        }
+        .clear-all-btn:hover {
+            background-color: #c82333;
+        }
+        .batch-actions {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .image-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            position: relative;
+            --card-id: 0;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #c0c5c5;
+            font-size: 12px;
+            margin: 0;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        .image-pair {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .image-box {
+            flex: 1;
+            min-width: 200px;
+        }
+        .image-box h3 {
+            margin-bottom: 10px;
+            color: #567;
+            font-size: 16px;
+        }
+        .preview-img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            background: white;
+            max-height: 200px;
+            object-fit: contain;
+            cursor: zoom-in;
+            transition: all 0.2s ease;
+        }
+        .preview-img:hover {
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        }
+        .tip {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .guide-tip {
+            background-color: #e8f4fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #0c5460;
+            line-height: 1.5;
+        }
+        .file-name {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        .single-download-btn {
+            background-color: #28a745;
+            margin-top: 5px;
+        }
+        .single-download-btn:hover {
+            background-color: #218838;
+        }
+        .batch-download-btn {
+            background-color: #19a2b8;
+        }
+        .batch-download-btn:hover {
+            background-color: #138496;
+        }
+        .url-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .url-input {
+            flex: 1;
+            min-width: 300px;
+        }
+        .url-btn {
+            background-color: #20c997;
+        }
+        .url-btn:hover {
+            background-color: #17a673;
+        }
+        .error-tip {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            background-color: #28a745;
+        }
+        .toast.error {
+            background-color: #dc3545;
+        }
+        .toast.warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .toast.info {
+            background-color: #17a2b8;
+        }
+
+        .image-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .image-viewer.show {
+            display: flex;
+        }
+        .viewer-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .viewer-img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .viewer-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(104, 103, 109, 0.8);
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            opacity: 0.5; 
+        }
+        .viewer-close:hover {
+            background-color: #c82333;
+        }
+        .resize-controls {
+            margin-top: 4px;
+            padding: 4px;
+            background: #f0f8ff;
+            border-radius: 4px;
+            display: none;
+        }
+        .resize-controls.show {
+            display: block;
+        }
+        .resize-input-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        .resize-input-group input {
+            flex: 1;
+            min-width: 60px;
+            padding: 4px;
+        }
+        .aspect-ratio-group {
+            margin-bottom: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .resize-btn {
+            background-color: #ff9214;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 0;
+        }
+        .resize-btn:hover {
+            background-color: #e07800;
+        }
+        .confirm-resize-btn {
+            background-color: #fd7e14;
+        }
+        .confirm-resize-btn:hover {
+            background-color: #e46c0a;
+        }
+        .cancel-resize-btn {
+            background-color: #6c757d;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 0;
+        }
+        .cancel-resize-btn:hover {
+            background-color: #5a6268;
+        }
+        .pixel-info {
+            font-size: 12px;
+            color: #567;
+            margin: 5px 0;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>图片马赛克加密解密工具</h1>
+              <!-- 操作指引 -->
+            <div class="guide-tip">
+                <strong>操作指引：</strong><br>
+                1. 先导入图片,加密图片时设置好分割块数和密码,点击「加密图片」即可完成加密,解密图片时必须输入正确的分割块数和密码点击「解密图片」才能解密成功；<br>
+                2. 分割块数应尽量设置为可被图片宽与高的像素数整除,未被整除的部分不参与加密.分割块数越高加密强度越大；<br>
+                3. 若加载网络图片失败，网站可能启用了防盗链,建议直接下载图片到本地，通过「本地图片上传」功能导入；<br>
+                4. 加密完成后分割块数和密码会默认附在加密后的文件名上以防忘记(警告:文件名或密码过长或密码包含某些特殊字符会使此功能失效)；<br>
+                5. 若已加密的图片因受到缩放或拉伸的破坏而无法解密出内容,使用「调整尺寸」功能将图片恢复至原有尺寸即可最大程度的解密出原有内容.
+            </div>    
+        <!-- 网络链接导入区域 -->
+        <div class="input-group">
+            <label for="imageUrl">从网络链接导入图片</label>
+            <div class="url-input-group">
+                <input type="text" id="imageUrl" class="url-input" placeholder="请输入图片URL（例：https://xxx.com/xxx.jpg）">
+                <button id="loadUrlBtn" class="url-btn">加载网络图片</button>
+            </div>
+            
+            <p class="error-tip" id="urlErrorTip">URL格式错误或图片加载失败！</p>
+        </div>
+
+        <div class="input-group">
+            <label for="imageFile">选择本地图片文件（支持批量导入）</label>
+            <input type="file" id="imageFile" accept="image/*" multiple>
+            <!-- 清空所有图片按钮 -->
+            <button id="clearAllBtn" class="clear-all-btn">清空所有已加载图片</button>
+        </div>
+
+        <div class="input-group">
+            <label for="blockCount">分割块数（每行/每列，1-256）</label>
+            <input type="number" id="blockCount" placeholder="请设置分割块数" value="32" min="1" max="256">
+        </div>
+
+        <div class="input-group">
+            <label for="secretKey">密码（任意字符串）</label>
+            <input type="text" id="secretKey" placeholder="请输入加密/解密密码" value="123456">
+        </div>
+
+        <div class="input-group">
+            <button id="encryptBtn">加密图片</button>
+            <button id="decryptBtn">解密图片</button>
+            <button id="batchDownloadBtn" class="batch-download-btn" disabled>下载所有处理后的图片</button>
+        </div>
+
+        <div class="batch-actions" id="batchTip" style="display: none;">
+            <p>已加载 <span id="fileCount">0</span> 个图片</p>
+        </div>
+
+        <div class="image-grid" id="imageGrid"></div>
+    </div>
+
+    <!-- 轻量级提示框容器 -->
+    <div id="toastContainer" class="toast"></div>
+
+    <!-- 大图预览层 -->
+    <div id="imageViewer" class="image-viewer">
+        <div class="viewer-content">
+            <button class="viewer-close" id="viewerCloseBtn">×</button>
+            <img src="" alt="大图预览" class="viewer-img" id="viewerImg">
+        </div>
+    </div>
+
+    <script>
+        // 全局变量 - 存储每个文件的处理信息（改用对象存储，避免索引问题）
+        let fileProcessData = {};
+        // 自增ID，用于标识每个图片
+        let imageIdCounter = 0;
+        // 当前已加载的图片数量
+        let loadedImageCount = 0;
+
+        // 变换类型定义
+        const TRANSFORM_TYPES = {
+            NONE: 0,        // 无变化
+            HORIZONTAL: 1,  // 水平翻转
+            VERTICAL: 2,    // 垂直翻转
+            ROTATE_180: 3   // 旋转180度
+        };
+
+        // DOM元素
+        const imageFile = document.getElementById('imageFile');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const blockCountInput = document.getElementById('blockCount');
+        const secretKeyInput = document.getElementById('secretKey');
+        const encryptBtn = document.getElementById('encryptBtn');
+        const decryptBtn = document.getElementById('decryptBtn');
+        const batchDownloadBtn = document.getElementById('batchDownloadBtn');
+        const imageGrid = document.getElementById('imageGrid');
+        const batchTip = document.getElementById('batchTip');
+        const fileCount = document.getElementById('fileCount');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const loadUrlBtn = document.getElementById('loadUrlBtn');
+        const urlErrorTip = document.getElementById('urlErrorTip');
+        const toastContainer = document.getElementById('toastContainer');
+        // 大图预览相关元素
+        const imageViewer = document.getElementById('imageViewer');
+        const viewerImg = document.getElementById('viewerImg');
+        const viewerCloseBtn = document.getElementById('viewerCloseBtn');
+
+        // 初始化画布（每个文件独立画布）
+        function createCanvasPair(imageId) {
+            return {
+                id: imageId, // 唯一ID
+                originalCanvas: document.createElement('canvas'),
+                processedCanvas: document.createElement('canvas'),
+                originalImageData: null,
+                blockSize: { width: 0, height: 0 },
+                validSize: { width: 0, height: 0 },
+                isProcessed: false,
+                isEncrypt: false,
+                file: null,
+                isFromUrl: false,
+                cardElement: null,
+                originalImageSrc: '', // 存储待处理图片src
+                processedImageSrc: '', // 存储处理后图片src
+                originalWidth: 0, // 原始宽度（未调整前）
+                originalHeight: 0, // 原始高度（未调整前）
+                aspectRatio: 0 // 图片宽高比
+            };
+        }
+
+        // 处理文件名，过滤特殊字符
+        function sanitizeFileName(name) {
+            return name.replace(/[\\/:*?"<>|]/g, '_').trim();
+        }
+
+        // 生成带密钥和块数的文件名
+        function generateProcessedFileName(originalName, blockCount, secretKey, isEncrypt) {
+            const baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+            // 强制使用png格式
+            const ext = '.png';
+            const sanitizedKey = sanitizeFileName(secretKey);
+            //const timestamp = new Date().getTime();
+            const prefix = isEncrypt ? 'e' : 'd';
+            return `${baseName}_${prefix}_blocks${blockCount}_key${sanitizedKey}_${ext}`;
+        }
+
+        // 根据密钥生成随机序列
+        function getShuffledIndexArray(count, key, isDecrypt = false) {
+            let seed = 0;
+            for (let i = 0; i < key.length; i++) {
+                seed += key.charCodeAt(i) * (i + 1);
+            }
+            
+            function lcgRandom() {
+                seed = (seed * 1103515245 + 12345) % 2147483648;
+                return seed / 2147483648;
+            }
+
+            const indexArray = Array.from({ length: count }, (_, i) => i);
+            const result = [...indexArray];
+
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(lcgRandom() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+
+            if (isDecrypt) {
+                const reverseArray = new Array(count);
+                for (let i = 0; i < count; i++) {
+                    reverseArray[result[i]] = i;
+                }
+                return reverseArray;
+            }
+
+            return result;
+        }
+
+        // 根据密钥和块索引获取变换类型
+        function getBlockTransformType(blockIndex, key, totalBlocks) {
+            let seed = blockIndex;
+            for (let i = 0; i < key.length; i++) {
+                seed = (seed * 31 + key.charCodeAt(i)) % 2147483647;
+            }
+            // 确保生成0-3之间的整数（对应四种变换类型）
+            return Math.abs(seed) % 4;
+        }
+
+        // 对像素块进行变换处理
+        function transformBlockData(blockData, blockWidth, blockHeight, transformType, isDecrypt = false) {
+            const newBlockData = new Uint8ClampedArray(blockData.length);
+            const pixelCount = blockWidth * blockHeight;
+
+            // 解密时变换类型与加密时相同（因为所有变换都是自反的：水平翻转两次=原状态，垂直翻转两次=原状态，旋转180两次=原状态）
+            const actualType = transformType;
+
+            for (let y = 0; y < blockHeight; y++) {
+                for (let x = 0; x < blockWidth; x++) {
+                    let srcX = x;
+                    let srcY = y;
+
+                    switch (actualType) {
+                        case TRANSFORM_TYPES.HORIZONTAL:
+                            // 水平翻转：x坐标反转
+                            srcX = blockWidth - 1 - x;
+                            break;
+                        case TRANSFORM_TYPES.VERTICAL:
+                            // 垂直翻转：y坐标反转
+                            srcY = blockHeight - 1 - y;
+                            break;
+                        case TRANSFORM_TYPES.ROTATE_180:
+                            // 旋转180度：x和y都反转
+                            srcX = blockWidth - 1 - x;
+                            srcY = blockHeight - 1 - y;
+                            break;
+                        case TRANSFORM_TYPES.NONE:
+                        default:
+                            // 无变化
+                            break;
+                    }
+
+                    // 计算像素索引
+                    const srcIndex = (srcY * blockWidth + srcX) * 4;
+                    const destIndex = (y * blockWidth + x) * 4;
+
+                    // 复制像素数据（RGBA）
+                    newBlockData[destIndex] = blockData[srcIndex];     // R
+                    newBlockData[destIndex + 1] = blockData[srcIndex + 1]; // G
+                    newBlockData[destIndex + 2] = blockData[srcIndex + 2]; // B
+                    newBlockData[destIndex + 3] = blockData[srcIndex + 3]; // A
+                }
+            }
+
+            return newBlockData;
+        }
+
+        // 复制并变换像素块数据
+        function copyAndTransformBlock(srcImageData, destImageData, srcX, srcY, destX, destY, blockWidth, blockHeight, transformType, isDecrypt = false) {
+            const srcWidth = srcImageData.width;
+            const destWidth = destImageData.width;
+
+            // 提取原始块数据
+            const blockData = new Uint8ClampedArray(blockWidth * blockHeight * 4);
+            for (let y = 0; y < blockHeight; y++) {
+                for (let x = 0; x < blockWidth; x++) {
+                    const srcPixelIndex = ((srcY + y) * srcWidth + (srcX + x)) * 4;
+                    const blockPixelIndex = (y * blockWidth + x) * 4;
+                    blockData[blockPixelIndex] = srcImageData.data[srcPixelIndex];
+                    blockData[blockPixelIndex + 1] = srcImageData.data[srcPixelIndex + 1];
+                    blockData[blockPixelIndex + 2] = srcImageData.data[srcPixelIndex + 2];
+                    blockData[blockPixelIndex + 3] = srcImageData.data[srcPixelIndex + 3];
+                }
+            }
+
+            // 对块数据进行变换
+            const transformedBlockData = transformBlockData(blockData, blockWidth, blockHeight, transformType, isDecrypt);
+
+            // 将变换后的块数据写入目标位置
+            for (let y = 0; y < blockHeight; y++) {
+                for (let x = 0; x < blockWidth; x++) {
+                    const destPixelIndex = ((destY + y) * destWidth + (destX + x)) * 4;
+                    const blockPixelIndex = (y * blockWidth + x) * 4;
+                    destImageData.data[destPixelIndex] = transformedBlockData[blockPixelIndex];
+                    destImageData.data[destPixelIndex + 1] = transformedBlockData[blockPixelIndex + 1];
+                    destImageData.data[destPixelIndex + 2] = transformedBlockData[blockPixelIndex + 2];
+                    destImageData.data[destPixelIndex + 3] = transformedBlockData[blockPixelIndex + 3];
+                }
+            }
+        }
+
+        // 处理单个图片（加密/解密）
+        function processSingleImage(imageId, isDecrypt = false) {
+            const fileData = fileProcessData[imageId];
+            if (!fileData || !fileData.originalImageData) {
+                showToast('该图片未加载完成，无法处理！', 'error');
+                return false;
+            }
+
+            const blockCount = blockCountInput.value;
+            if (blockCount < 1 || blockCount > 256) {
+                showToast('分割块数必须在1-256之间！', 'error');
+                return false;
+            }
+
+            const key = secretKeyInput.value.trim();
+            if (!key) {
+                showToast('请输入密码！', 'error');
+                return false;
+            }
+
+            fileData.validSize.width = Math.floor(fileData.originalImageData.width / blockCount) * blockCount;
+            fileData.validSize.height = Math.floor(fileData.originalImageData.height / blockCount) * blockCount;
+            fileData.blockSize.width = fileData.validSize.width / blockCount;
+            fileData.blockSize.height = fileData.validSize.height / blockCount;
+
+            const totalBlocks = blockCount * blockCount;
+            const shuffledIndexes = getShuffledIndexArray(totalBlocks, key, isDecrypt);
+
+            const newImageData = new ImageData(
+                new Uint8ClampedArray(fileData.originalImageData.data),
+                fileData.originalImageData.width,
+                fileData.originalImageData.height
+            );
+
+            for (let blockIndex = 0; blockIndex < totalBlocks; blockIndex++) {
+                // 加密时：使用打乱后的索引获取变换类型
+                // 解密时：使用原始索引获取变换类型（保证和加密时一致）
+                const transformIndex = isDecrypt ? blockIndex : shuffledIndexes[blockIndex];
+                const transformType = getBlockTransformType(transformIndex, key, totalBlocks);
+
+                const targetBlockIndex = shuffledIndexes[blockIndex];
+                const srcRow = Math.floor(blockIndex / blockCount);
+                const srcCol = blockIndex % blockCount;
+                const srcX = srcCol * fileData.blockSize.width;
+                const srcY = srcRow * fileData.blockSize.height;
+
+                const targetRow = Math.floor(targetBlockIndex / blockCount);
+                const targetCol = targetBlockIndex % blockCount;
+                const targetX = targetCol * fileData.blockSize.width;
+                const targetY = targetRow * fileData.blockSize.height;
+
+                // 复制并变换像素块
+                copyAndTransformBlock(
+                    fileData.originalImageData,
+                    newImageData,
+                    srcX, srcY,
+                    targetX, targetY,
+                    fileData.blockSize.width,
+                    fileData.blockSize.height,
+                    transformType,
+                    isDecrypt
+                );
+            }
+
+            const ctx = fileData.processedCanvas.getContext('2d');
+            ctx.putImageData(newImageData, 0, 0);
+
+            fileData.isProcessed = true;
+            fileData.isEncrypt = !isDecrypt;
+            fileData.blockCount = blockCount;
+            fileData.secretKey = key;
+
+            const processedImg = document.getElementById(`processedImage_${imageId}`);
+            const processedSrc = fileData.processedCanvas.toDataURL('image/png');
+            processedImg.src = processedSrc;
+            processedImg.style.display = 'block';
+            processedImg.nextElementSibling.textContent = isDecrypt ? '已解密' : '已加密';
+            
+            // 存储处理后图片src，用于大图预览
+            fileData.processedImageSrc = processedSrc;
+            
+            const singleDownloadBtn = document.getElementById(`singleDownloadBtn_${imageId}`);
+            singleDownloadBtn.disabled = false;
+
+            return true;
+        }
+
+        // 批量处理图片
+        function batchProcessImages(isDecrypt = false) {
+            const imageIds = Object.keys(fileProcessData);
+            if (imageIds.length === 0) {
+                showToast('请先加载图片（本地或网络）！', 'warning');
+                return;
+            }
+
+            let successCount = 0;
+            imageIds.forEach(imageId => {
+                if (processSingleImage(imageId, isDecrypt)) {
+                    successCount++;
+                }
+            });
+
+            const blockCount = blockCountInput.value;
+            if (blockCount < 1 || blockCount > 256) {
+                showToast('分割块数必须在1-256之间！', 'error');
+                return false;
+            }
+
+            const key = secretKeyInput.value.trim();
+            if (!key) {
+                showToast('请输入密码！', 'error');
+                return false;
+            }
+            if (successCount > 0) {
+                batchDownloadBtn.disabled = false;
+                showToast(`成功处理${successCount}/${imageIds.length}个图片！`, 'success');
+            } else {
+                showToast('处理失败，请检查图片和参数！', 'error');
+            }
+        }
+
+        // 单个下载图片
+        function downloadSingleImage(imageId) {
+            const fileData = fileProcessData[imageId];
+            if (!fileData || !fileData.isProcessed) {
+                showToast('该图片未处理完成，无法下载！', 'warning');
+                return;
+            }
+
+            let originalFileName = 'image_from_url';
+            if (fileData.file) {
+                originalFileName = fileData.isFromUrl ? 
+                    `image_from_url_${new Date().getTime()}` : 
+                    fileData.file.name;
+            }
+
+            const newFileName = generateProcessedFileName(
+                originalFileName,
+                fileData.blockCount,
+                fileData.secretKey,
+                fileData.isEncrypt
+            );
+
+            const link = document.createElement('a');
+            link.href = fileData.processedCanvas.toDataURL('image/png');
+            link.download = newFileName;
+            link.click();
+        }
+
+        // 批量下载图片
+        function batchDownloadImages() {
+            const imageIds = Object.keys(fileProcessData);
+            const processedFiles = imageIds.filter(id => fileProcessData[id].isProcessed);
+            
+            if (processedFiles.length === 0) {
+                showToast('没有已处理的图片可下载！', 'warning');
+                return;
+            }
+
+            processedFiles.forEach((imageId, index) => {
+                setTimeout(() => {
+                    const fileData = fileProcessData[imageId];
+                    let originalFileName = 'image_from_url';
+                    if (fileData.file) {
+                        originalFileName = fileData.isFromUrl ? 
+                            `image_from_url_${new Date().getTime()}` : 
+                            fileData.file.name;
+                    }
+
+                    const newFileName = generateProcessedFileName(
+                        originalFileName,
+                        fileData.blockCount,
+                        fileData.secretKey,
+                        fileData.isEncrypt
+                    );
+
+                    const link = document.createElement('a');
+                    link.href = fileData.processedCanvas.toDataURL('image/png');
+                    link.download = newFileName;
+                    link.click();
+                }, index * 200);
+            });
+
+            showToast(`开始下载${processedFiles.length}个已处理的图片文件！`, 'info');
+        }
+
+        // 移除指定ID的图片
+        function removeImage(imageId) {
+            // 1. 获取文件数据
+            const fileData = fileProcessData[imageId];
+            if (!fileData) return;
+            // 释放Canvas和ImageData资源
+            if (fileData.originalCanvas) {
+                fileData.originalCanvas.width = 1;
+                fileData.originalCanvas.height = 1;
+                fileData.originalCanvas = null;
+            }
+            if (fileData.processedCanvas) {
+                fileData.processedCanvas.width = 1;
+                fileData.processedCanvas.height = 1;
+                fileData.processedCanvas = null;
+            }
+            fileData.originalImageData = null;
+            // 2. 移除DOM元素
+            if (fileData.cardElement && fileData.cardElement.parentNode) {
+                imageGrid.removeChild(fileData.cardElement);
+            }
+
+            // 3. 从对象中删除对应项
+            delete fileProcessData[imageId];
+            
+            // 4. 更新计数
+            loadedImageCount--;
+            updateFileCount();
+
+            // 5. 重置文件选择框（核心：解决无法重新加载的问题）
+            resetFileInput();
+
+            // 6. 如果没有剩余图片，禁用批量下载按钮
+            if (loadedImageCount === 0) {
+                batchDownloadBtn.disabled = true;
+                batchTip.style.display = 'none';
+            }
+
+            // 7. 提示
+            showToast('图片已成功移除！', 'info');
+        }
+
+        // 清空所有已加载图片
+        function clearAllImages() {
+            if (loadedImageCount === 0) {
+                showToast('暂无已加载的图片！', 'info');
+                return;
+            }
+
+            // 1. 确认清空
+            if (!confirm('确定要清空所有已加载的图片吗？')) {
+                return;
+            }
+
+            // 2. 移除所有DOM卡片
+            Object.values(fileProcessData).forEach(fileData => {
+                // 释放Canvas
+                if (fileData.originalCanvas) {
+                    fileData.originalCanvas.width = 1;
+                    fileData.originalCanvas.height = 1;
+                }
+                if (fileData.processedCanvas) {
+                    fileData.processedCanvas.width = 1;
+                    fileData.processedCanvas.height = 1;
+                }
+            fileData.originalImageData = null;
+                if (fileData.cardElement && fileData.cardElement.parentNode) {
+                    imageGrid.removeChild(fileData.cardElement);
+                }
+            });
+
+            // 3. 清空数据对象
+            fileProcessData = {};
+            loadedImageCount = 0;
+
+            // 4. 重置文件选择框
+            resetFileInput();
+
+            // 5. 更新计数和UI
+            updateFileCount();
+            batchDownloadBtn.disabled = true;
+            batchTip.style.display = 'none';
+
+            // 6. 提示
+            showToast('所有图片已清空！', 'info');
+        }
+
+        // 重置文件选择框（核心解决无法重新加载的问题）
+        function resetFileInput() {
+            imageFile.value = '';
+        }
+
+        // 更新已加载文件计数
+        function updateFileCount() {
+            fileCount.textContent = loadedImageCount;
+            if (loadedImageCount > 0) {
+                batchTip.style.display = 'block';
+            } else {
+                batchTip.style.display = 'none';
+            }
+        }
+
+        // 轻量级提示框（替代alert）
+        function showToast(message, type = 'info') {
+            toastContainer.textContent = message;
+            toastContainer.className = `toast ${type}`;
+            toastContainer.classList.add('show');
+
+            // 5秒后隐藏
+            setTimeout(() => {
+                toastContainer.classList.remove('show');
+            }, 5000);
+        }
+
+        // 验证图片URL合法性
+        function validateImageUrl(url) {
+            if (!url) return false;
+            const imageUrlRegex = /^(https?:\/\/).+\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i;
+            return imageUrlRegex.test(url.trim());
+        }
+
+        // 打开大图预览
+        function openImageViewer(src) {
+            viewerImg.src = src;
+            imageViewer.classList.add('show');
+            // 禁止页面滚动
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭大图预览
+        function closeImageViewer() {
+            imageViewer.classList.remove('show');
+            viewerImg.src = '';
+            // 恢复页面滚动
+            document.body.style.overflow = '';
+        }
+
+        // 更新图片像素数显示
+        function updatePixelInfo(imageId, width, height) {
+            const pixelInfoEl = document.getElementById(`pixelInfo_${imageId}`);
+            if (pixelInfoEl) {
+                pixelInfoEl.textContent = `像素尺寸：${width} × ${height}`;
+            }
+        }
+
+        // 处理保持纵横比逻辑
+        function handleAspectRatio(imageId, isWidthChange = true) {
+            const fileData = fileProcessData[imageId];
+            if (!fileData || !fileData.aspectRatio) return;
+
+            const widthInput = document.getElementById(`resizeWidth_${imageId}`);
+            const heightInput = document.getElementById(`resizeHeight_${imageId}`);
+            const keepAspectRatio = document.getElementById(`keepAspect_${imageId}`).checked;
+
+            if (!keepAspectRatio) return;
+
+            if (isWidthChange) {
+                const newWidth = parseInt(widthInput.value) || fileData.originalCanvas.width;
+                const newHeight = Math.round(newWidth / fileData.aspectRatio);
+                heightInput.value = newHeight;
+            } else {
+                const newHeight = parseInt(heightInput.value) || fileData.originalCanvas.height;
+                const newWidth = Math.round(newHeight * fileData.aspectRatio);
+                widthInput.value = newWidth;
+            }
+        }
+
+        // 显示调整尺寸控件
+        function showResizeControls(imageId) {
+            const resizeControls = document.getElementById(`resizeControls_${imageId}`);
+            if (resizeControls) {
+                resizeControls.classList.add('show');
+                // 初始化输入框值
+                const fileData = fileProcessData[imageId];
+                const widthInput = document.getElementById(`resizeWidth_${imageId}`);
+                const heightInput = document.getElementById(`resizeHeight_${imageId}`);
+                widthInput.value = fileData.originalCanvas.width;
+                heightInput.value = fileData.originalCanvas.height;
+            }
+        }
+
+        // 隐藏调整尺寸控件
+        function hideResizeControls(imageId) {
+            const resizeControls = document.getElementById(`resizeControls_${imageId}`);
+            if (resizeControls) {
+                resizeControls.classList.remove('show');
+            }
+        }
+
+        // 执行图片调整尺寸
+        function resizeImage(imageId) {
+            const fileData = fileProcessData[imageId];
+            if (!fileData) {
+                showToast('图片数据不存在！', 'error');
+                return;
+            }
+
+            const widthInput = document.getElementById(`resizeWidth_${imageId}`);
+            const heightInput = document.getElementById(`resizeHeight_${imageId}`);
+            const newWidth = parseInt(widthInput.value);
+            const newHeight = parseInt(heightInput.value);
+
+            // 验证输入
+            if (isNaN(newWidth) || isNaN(newHeight) || newWidth < 1 || newHeight < 1) {
+                showToast('请输入有效的尺寸（大于0的整数）！', 'error');
+                return;
+            }
+
+            try {
+                // 创建临时图片对象，用于重新绘制
+                const tempImg = new Image();
+        tempImg.crossOrigin = 'anonymous';
+                tempImg.src = fileData.originalImageSrc;
+                tempImg.onload = function() {
+                    // 重置原始画布尺寸
+                    fileData.originalCanvas.width = newWidth;
+                    fileData.originalCanvas.height = newHeight;
+                    const ctx = fileData.originalCanvas.getContext('2d');
+                    // 清空画布并重新绘制调整后的图片
+                    ctx.clearRect(0, 0, newWidth, newHeight);
+                    ctx.drawImage(tempImg, 0, 0, newWidth, newHeight);
+                    // 更新ImageData
+                    fileData.originalImageData = ctx.getImageData(0, 0, newWidth, newHeight);
+                    // 更新预览图
+                    const originalImg = document.getElementById(`originalImage_${imageId}`);
+                    originalImg.src = fileData.originalCanvas.toDataURL('image/png');
+                    // 更新像素数显示
+                    updatePixelInfo(imageId, newWidth, newHeight);
+                    // 更新处理画布尺寸（保证和原始画布一致）
+                    fileData.processedCanvas.width = newWidth;
+                    fileData.processedCanvas.height = newHeight;
+                    // 隐藏调整控件
+                    hideResizeControls(imageId);
+                    // 重置处理状态（调整尺寸后需要重新加密/解密）
+                    fileData.isProcessed = false;
+                    const processedImg = document.getElementById(`processedImage_${imageId}`);
+                    processedImg.src = '';
+                    processedImg.style.display = 'none';
+                    processedImg.nextElementSibling.textContent = '未处理';
+                    const singleDownloadBtn = document.getElementById(`singleDownloadBtn_${imageId}`);
+                    singleDownloadBtn.disabled = true;
+                    // 提示
+                    showToast('图片尺寸调整成功！', 'success');
+                };
+            } catch (e) {
+                showToast(`调整尺寸失败：${e.message}`, 'error');
+            }
+        }
+
+        // 加载网络图片
+        function loadImageFromUrl() {
+            const url = imageUrlInput.value.trim();
+            urlErrorTip.style.display = 'none';
+
+            if (!validateImageUrl(url)) {
+                urlErrorTip.textContent = '请输入有效的图片URL（以http/https开头，包含jpg/png等后缀）！';
+                urlErrorTip.style.display = 'block';
+                return;
+            }
+
+            // 生成唯一ID
+            const imageId = imageIdCounter++;
+            const fileData = createCanvasPair(imageId);
+            fileData.isFromUrl = true;
+            fileData.file = { name: `image_from_url_${imageId + 1}` };
+
+            // 创建卡片（新增像素数显示和调整尺寸控件）
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            card.style.setProperty('--card-id', imageId);
+            card.innerHTML = `
+                <button class="remove-btn" data-image-id="${imageId}">X</button>
+                <div class="file-name">图片来源：网络链接 (${url.substring(0, 50)}${url.length > 50 ? '...' : ''})</div>
+                <div class="image-pair">
+                    <div class="image-box">
+                        <h3>待处理图片</h3>
+                        <img id="originalImage_${imageId}" src="" alt="待处理图片" class="preview-img" style="display: none;">
+                        <span id="pixelInfo_${imageId}" class="pixel-info"></span>
+                        <button id="resizeBtn_${imageId}" class="resize-btn">调整尺寸</button>
+                        <div id="resizeControls_${imageId}" class="resize-controls">
+                            <div class="resize-input-group">
+                                <input type="number" id="resizeWidth_${imageId}" min="1" placeholder="宽度">
+                                <input type="number" id="resizeHeight_${imageId}" min="1" placeholder="高度">
+                            </div>
+                            <div class="aspect-ratio-group">
+                                <input type="checkbox" id="keepAspect_${imageId}" checked>
+                                <label for="keepAspect_${imageId}">保持纵横比</label>
+                            </div>
+                            <div class="resize-btn-group">
+                                <button id="confirmResize_${imageId}" class="confirm-resize-btn resize-btn">确认调整</button>
+                                <button id="cancelResize_${imageId}" class="cancel-resize-btn">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="image-box">
+                        <h3>处理后图片</h3>
+                        <img id="processedImage_${imageId}" src="" alt="处理后图片" class="preview-img" style="display: none;">
+                        <p class="tip">未处理</p>
+                        <button id="singleDownloadBtn_${imageId}" class="single-download-btn" disabled>下载此图片</button>
+                    </div>
+                </div>
+            `;
+            fileData.cardElement = card;
+            imageGrid.appendChild(card);
+
+            // 绑定移除按钮事件
+            card.querySelector('.remove-btn').addEventListener('click', function() {
+                const id = parseInt(this.getAttribute('data-image-id'));
+                removeImage(id);
+            });
+
+            // 绑定单个下载事件
+            document.getElementById(`singleDownloadBtn_${imageId}`).addEventListener('click', () => {
+                downloadSingleImage(imageId);
+            });
+
+            // 绑定调整尺寸按钮事件
+            document.getElementById(`resizeBtn_${imageId}`).addEventListener('click', () => {
+                showResizeControls(imageId);
+            });
+
+            // 绑定取消调整按钮事件
+            document.getElementById(`cancelResize_${imageId}`).addEventListener('click', () => {
+                hideResizeControls(imageId);
+            });
+
+            // 绑定确认调整按钮事件
+            document.getElementById(`confirmResize_${imageId}`).addEventListener('click', () => {
+                resizeImage(imageId);
+            });
+
+            // 绑定宽度/高度输入框变化事件（保持纵横比）
+            document.getElementById(`resizeWidth_${imageId}`).addEventListener('input', () => {
+                handleAspectRatio(imageId, true);
+            });
+            document.getElementById(`resizeHeight_${imageId}`).addEventListener('input', () => {
+                handleAspectRatio(imageId, false);
+            });
+
+            // 绑定保持纵横比复选框变化事件
+            document.getElementById(`keepAspect_${imageId}`).addEventListener('change', () => {
+                handleAspectRatio(imageId, true);
+            });
+
+            // 加载图片
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            img.onload = function() {
+                try {
+                    fileData.originalCanvas.width = img.width;
+                    fileData.originalCanvas.height = img.height;
+                    fileData.processedCanvas.width = img.width;
+                    fileData.processedCanvas.height = img.height;
+                    // 存储原始尺寸和宽高比
+                    fileData.originalWidth = img.width;
+                    fileData.originalHeight = img.height;
+                    fileData.aspectRatio = img.width / img.height;
+
+                    const ctx = fileData.originalCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    fileData.originalImageData = ctx.getImageData(0, 0, img.width, img.height);
+
+                    const originalImg = document.getElementById(`originalImage_${imageId}`);
+                    const originalSrc = img.src;
+                    originalImg.src = originalSrc;
+                    originalImg.style.display = 'block';
+                    
+                    
+                    // 更新像素数显示
+                    updatePixelInfo(imageId, img.width, img.height);
+
+                    // 存储待处理图片src，用于大图预览
+                    fileData.originalImageSrc = originalSrc;
+                    
+                    // 绑定待处理图片点击预览事件
+                    originalImg.addEventListener('click', function() {
+                        openImageViewer(originalSrc);
+                    });
+
+                    // 绑定处理后图片点击预览事件（初始为空，处理后会更新）
+                    const processedImg = document.getElementById(`processedImage_${imageId}`);
+                    processedImg.addEventListener('click', function() {
+                        if (this.src && this.src !== 'about:blank') {
+                            openImageViewer(this.src);
+                        } else {
+                            showToast('该图片尚未处理，无法预览！', 'warning');
+                        }
+                    });
+
+                    // 图片加载完成后才计入总数
+                    fileProcessData[imageId] = fileData;
+                    loadedImageCount++;
+                    updateFileCount();
+                    imageUrlInput.value = '';
+                } catch (e) {
+                    showToast(`图片加载失败：${e.message}`, 'error');
+                    removeImage(imageId);
+                    imageGrid.removeChild(card);
+                }
+            };
+
+            img.onerror = function() {
+                urlErrorTip.textContent = '图片加载失败！请检查URL是否有效，或直接下载图片到本地上传。';
+                urlErrorTip.style.display = 'block';
+                removeImage(imageId);
+                imageGrid.removeChild(card);
+            };
+
+            img.src = url;
+        }
+
+        // 加载本地图片
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    showToast(`文件${file.name}不是图片类型！`, 'warning');
+                    return;
+                }
+
+                const imageId = imageIdCounter++;
+                const fileData = createCanvasPair(imageId);
+                fileData.file = file;
+                fileData.isFromUrl = false;
+
+                // 创建卡片（新增像素数显示和调整尺寸控件）
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.style.setProperty('--card-id', imageId);
+                card.innerHTML = `
+                    <button class="remove-btn" data-image-id="${imageId}">X</button>
+                    <div class="file-name">文件：${file.name}</div>
+                    <div class="image-pair">
+                        <div class="image-box">
+                            <h3>待处理图片</h3>
+                            <img id="originalImage_${imageId}" src="" alt="待处理图片" class="preview-img" style="display: none;">
+                            <span id="pixelInfo_${imageId}" class="pixel-info"></span>
+                            <button id="resizeBtn_${imageId}" class="resize-btn">调整尺寸</button>
+                            <div id="resizeControls_${imageId}" class="resize-controls">
+                                <div class="resize-input-group">
+                                    <input type="number" id="resizeWidth_${imageId}" min="1" placeholder="宽度">
+                                    <input type="number" id="resizeHeight_${imageId}" min="1" placeholder="高度">
+                                </div>
+                                <div class="aspect-ratio-group">
+                                    <input type="checkbox" id="keepAspect_${imageId}" checked>
+                                    <label for="keepAspect_${imageId}">保持纵横比</label>
+                                </div>
+                                <div class="resize-btn-group">
+                                    <button id="confirmResize_${imageId}" class="confirm-resize-btn resize-btn">确认调整</button>
+                                    <button id="cancelResize_${imageId}" class="cancel-resize-btn">取消</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="image-box">
+                            <h3>处理后图片</h3>
+                            <img id="processedImage_${imageId}" src="" alt="处理后图片" class="preview-img" style="display: none;">
+                            <p class="tip">未处理</p>
+                            <button id="singleDownloadBtn_${imageId}" class="single-download-btn" disabled>下载此图片</button>
+                        </div>
+                    </div>
+                `;
+                fileData.cardElement = card;
+                imageGrid.appendChild(card);
+
+                // 绑定移除按钮事件
+                card.querySelector('.remove-btn').addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-image-id'));
+                    removeImage(id);
+                    imageGrid.removeChild(card);
+                });
+
+                // 绑定单个下载事件
+                document.getElementById(`singleDownloadBtn_${imageId}`).addEventListener('click', () => {
+                    downloadSingleImage(imageId);
+                });
+
+                // 绑定调整尺寸按钮事件
+                document.getElementById(`resizeBtn_${imageId}`).addEventListener('click', () => {
+                    showResizeControls(imageId);
+                });
+
+                // 绑定取消调整按钮事件
+                document.getElementById(`cancelResize_${imageId}`).addEventListener('click', () => {
+                    hideResizeControls(imageId);
+                });
+
+                // 绑定确认调整按钮事件
+                document.getElementById(`confirmResize_${imageId}`).addEventListener('click', () => {
+                    resizeImage(imageId);
+                });
+
+                // 绑定宽度/高度输入框变化事件（保持纵横比）
+                document.getElementById(`resizeWidth_${imageId}`).addEventListener('input', () => {
+                    handleAspectRatio(imageId, true);
+                });
+                document.getElementById(`resizeHeight_${imageId}`).addEventListener('input', () => {
+                    handleAspectRatio(imageId, false);
+                });
+
+                // 绑定保持纵横比复选框变化事件
+                document.getElementById(`keepAspect_${imageId}`).addEventListener('change', () => {
+                    handleAspectRatio(imageId, true);
+                });
+
+                // 读取文件并加载图片
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+            img.crossOrigin = 'anonymous';
+                    img.onload = function() {
+                        try {
+                            fileData.originalCanvas.width = img.width;
+                            fileData.originalCanvas.height = img.height;
+                            fileData.processedCanvas.width = img.width;
+                            fileData.processedCanvas.height = img.height;
+                            // 存储原始尺寸和宽高比
+                            fileData.originalWidth = img.width;
+                            fileData.originalHeight = img.height;
+                            fileData.aspectRatio = img.width / img.height;
+
+                            const ctx = fileData.originalCanvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            fileData.originalImageData = ctx.getImageData(0, 0, img.width, img.height);
+
+                            const originalImg = document.getElementById(`originalImage_${imageId}`);
+                            const originalSrc = img.src;
+                            originalImg.src = originalSrc;
+                            originalImg.style.display = 'block';
+                            
+                            
+                            // 更新像素数显示
+                            updatePixelInfo(imageId, img.width, img.height);
+
+                            // 存储待处理图片src，用于大图预览
+                            fileData.originalImageSrc = originalSrc;
+                            
+                            // 绑定待处理图片点击预览事件
+                            originalImg.addEventListener('click', function() {
+                                openImageViewer(originalSrc);
+                            });
+
+                            // 绑定处理后图片点击预览事件
+                            const processedImg = document.getElementById(`processedImage_${imageId}`);
+                            processedImg.addEventListener('click', function() {
+                                if (this.src && this.src !== 'about:blank') {
+                                    openImageViewer(this.src);
+                                } else {
+                                    showToast('该图片尚未处理，无法预览！', 'warning');
+                                }
+                            });
+
+                            // 图片加载完成后计入总数
+                            fileProcessData[imageId] = fileData;
+                            loadedImageCount++;
+                            updateFileCount();
+                        } catch (e) {
+                            showToast(`图片处理失败：${e.message}`, 'error');
+                            removeImage(imageId);
+                        }
+                    };
+
+                    img.onerror = function() {
+                        showToast(`图片${file.name}加载失败！`, 'error');
+                        removeImage(imageId);
+                    };
+
+                    img.src = event.target.result;
+                };
+
+                reader.onerror = function() {
+                    showToast(`文件${file.name}读取失败！`, 'error');
+                    removeImage(imageId);
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            // 重置文件选择框，解决重复选择同一文件不触发的问题
+            resetFileInput();
+        }
+
+        // 绑定事件
+        function initEventListeners() {
+            // 本地文件选择
+            imageFile.addEventListener('change', handleFileSelect);
+            // 清空所有图片
+            clearAllBtn.addEventListener('click', clearAllImages);
+            // 加密按钮
+            encryptBtn.addEventListener('click', () => batchProcessImages(false));
+            // 解密按钮
+            decryptBtn.addEventListener('click', () => batchProcessImages(true));
+            // 批量下载按钮
+            batchDownloadBtn.addEventListener('click', batchDownloadImages);
+            // 加载网络图片按钮
+            loadUrlBtn.addEventListener('click', loadImageFromUrl);
+            // 大图预览关闭按钮
+            viewerCloseBtn.addEventListener('click', closeImageViewer);
+            // 点击预览层空白处关闭
+            imageViewer.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeImageViewer();
+                }
+            });
+            // 按ESC关闭预览
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && imageViewer.classList.contains('show')) {
+                    closeImageViewer();
+                }
+            });
+        }
+
+        // 初始化
+        initEventListeners();
+    </script>
+</body>
+</html>
