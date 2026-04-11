@@ -7,7 +7,7 @@
 # V2.0.0 :
 > - Enhanced encryption. Each pixel block will not only be rearranged but also undergo different flipping operations after encryption, improving encryption security.
 
-## <p align="center">Image-Mosaic-Encryption-and-Decryption-Tool-</p>
+## Image-Mosaic-Encryption-and-Decryption-Tool-
 
 This is an image encryption/decryption tool based on HTML + JS, distributed as a single file that requires no installation or runtime environment—simply download it locally and run it directly in a browser.
 
@@ -29,7 +29,7 @@ Important notice: The author assumes no responsibility or liability for any loss
 # V2.0.0 : 
 > - 强化加密,每个像素块在加密后除了会重新排列外还会执行不同的翻转处理，提升加密安全性.
 
-## <p align="center">图片马赛克加密解密工具</p>
+## 图片马赛克加密解密工具 
 
 这是一个图片加密/解密的工具,基于 HTML + JS,单文件,无需安装环境,可直接下载到本地用浏览器来运行.
 
@@ -52,7 +52,7 @@ Important notice: The author assumes no responsibility or liability for any loss
 # V2.0.0 :
 > - 暗号化を強化。各ピクセルブロックは暗号化後、並び替えに加えて異なる反転処理が実行され、暗号化の安全性が向上します。
 
-## <p align="center">## 画像モザイク暗号化復号化ツール</p>
+## 画像モザイク暗号化復号化ツール 
 
 これは、HTML + JSに基づく画像の暗号化/復号化ツールであり、単一ファイルで構成されており、インストール環境は不要で、直接ダウンロードしてローカルでブラウザで実行できます。
 
