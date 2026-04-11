@@ -1,10 +1,13 @@
-﻿V2.0.0: Enhanced encryption. Each pixel block will not only be rearranged but also undergo different flipping operations after encryption, improving encryption security.
 
-V2.0.0: 强化加密,每个像素块在加密后除了会重新排列外还会执行不同的翻转处理，提升加密安全性.
+# V3.0.0 :
+> - Added the Resize function capable of repairing damaged encrypted images.(If an encrypted image cannot be decrypted because it has been damaged by scaling or stretching, use the Resize function to restore the image to its original dimensions to decrypt the original content to the greatest extent possible.)
+> - Added image pixel dimension display function.
+> - Optimized the user interface.
 
-V2.0.0: 暗号化を強化。各ピクセルブロックは暗号化後、並び替えに加えて異なる反転処理が実行され、暗号化の安全性が向上します。
+# V2.0.0 :
+> - Enhanced encryption. Each pixel block will not only be rearranged but also undergo different flipping operations after encryption, improving encryption security.
 
-# Image-Mosaic-Encryption-and-Decryption-Tool-
+## <p align="center">Image-Mosaic-Encryption-and-Decryption-Tool-</p>
 
 This is an image encryption/decryption tool based on HTML + JS, distributed as a single file that requires no installation or runtime environment—simply download it locally and run it directly in a browser.
 
@@ -16,7 +19,17 @@ Images can be imported either via local upload or through web URLs, with support
 
 Important notice: The author assumes no responsibility or liability for any losses, disputes, legal issues, or consequences arising from your use of this tool, especially those resulting from violations of applicable laws and regulations. Your use of this tool constitutes agreement to these terms; if you do not agree, please refrain from using it.
 
-# 图片马赛克加密解密工具
+
+
+# V3.0.0 : 
+> - 新增可修复受损加密图片的「调整尺寸」功能.(若已加密的图片因受到图片缩放或拉伸的破坏而无法解密出内容,使用「调整尺寸」功能将图片恢复至原有尺寸即可最大程度的解密出原有内容.)
+> - 图片像素尺寸显示功能.
+> - 用户界面优化
+
+# V2.0.0 : 
+> - 强化加密,每个像素块在加密后除了会重新排列外还会执行不同的翻转处理，提升加密安全性.
+
+## <p align="center">图片马赛克加密解密工具</p>
 
 这是一个图片加密/解密的工具,基于 HTML + JS,单文件,无需安装环境,可直接下载到本地用浏览器来运行.
 
@@ -28,7 +41,18 @@ Important notice: The author assumes no responsibility or liability for any loss
 
 重要信息:您因使用此工具而产生的任何损失,纠纷,争议,及任何因违反法律法规所造成的责任与后果均与此工具的作者无关.当您使用此工具时即代表您同意上述协议,否则请不要使用此工具.
 
-# 画像モザイク暗号化復号化ツール
+
+
+# V3.0.0 :
+> - 暗号化された破損画像を修復できる「サイズ調整」機能を追加しました。
+（暗号化済みの画像が拡大縮小または引き伸ばしによって破損し、コンテンツを復号できなくなった場合、「サイズ調整」機能で画像を元のサイズに戻すことで、元のコンテンツを最大限復号することができます。）
+> - 画像ピクセルサイズ表示機能を追加しました。
+> - ユーザーインターフェース（UI）を最適化しました。
+
+# V2.0.0 :
+> - 暗号化を強化。各ピクセルブロックは暗号化後、並び替えに加えて異なる反転処理が実行され、暗号化の安全性が向上します。
+
+## <p align="center">## 画像モザイク暗号化復号化ツール</p>
 
 これは、HTML + JSに基づく画像の暗号化/復号化ツールであり、単一ファイルで構成されており、インストール環境は不要で、直接ダウンロードしてローカルでブラウザで実行できます。
 
