@@ -1,65 +1,61 @@
+## Image Mosaic Encryption and Decryption Tool
 
-# V3.0.0 :
-> - Added the Resize function capable of repairing damaged encrypted images.(If an encrypted image cannot be decrypted because it has been damaged by scaling or stretching, use the Resize function to restore the image to its original dimensions to decrypt the original content to the greatest extent possible.)
-> - Added image pixel dimension display function.
-> - Optimized the user interface.
+This is an image encryption/decryption tool built with HTML + JS. It is a single-file application that requires no installation, no environment configuration, and no internet connection. All functions can be run directly in a browser, with cross-platform support for both desktop and mobile browsers.
 
-# V2.0.0 :
-> - Enhanced encryption. Each pixel block will not only be rearranged but also undergo different flipping operations after encryption, improving encryption security.
+The tool encrypts/decrypts images by splitting them into blocks of up to the maximum pixel count. Based on a set password, the blocks are shuffled, flipped, and reassembled into a new image with the same dimensions, aspect ratio, and pixel count as the original.
 
-## Image-Mosaic-Encryption-and-Decryption-Tool-
+The encryption/decryption process is completely lossless. The decrypted content remains unaffected by changes to the filename, image format, moderate image scaling, or watermarking.
 
-This is an image encryption/decryption tool based on HTML + JS, distributed as a single file that requires no installation or runtime environment—simply download it locally and run it directly in a browser.
+Unlike ordinary encryption tools, the encrypted output is still a valid image with no MIME type restrictions. It enhances the privacy and security of image-based information shared online, making it ideal for social media platforms that allow free image uploads. It effectively defends against unauthorized third-party surveillance and censorship, protecting users’ freedom of information exchange and privacy.
 
-The tool works by dividing an image into a set number of equally sized pixel blocks, then shuffling these blocks in a specific order determined by a user-defined password before reassembling them into a new image with the same dimensions, aspect ratio, and total pixel count as the original. The block count used for splitting is adjustable; a higher value increases encryption strength. For optimal encryption results , the chosen block count should ideally divide evenly into both the image's width and height in pixels. 
+It supports partial encryption of specific image areas, replacing traditional unrecoverable image censorship methods.
 
-Unlike conventional encryption tools, the encrypted output remains a valid image file. By using this tool and entering the correct block count and password, the original image can be fully restored. The process is resilient against changes in filename, image format conversion, moderate scaling, and even watermarking. This makes it particularly useful for enhancing the privacy and security of image sharing over the internet—especially on social media platforms that allow free image uploads—effectively protecting against unwanted third-party surveillance or censorship, and safeguarding users' freedom and privacy in information sharing.
+The tool runs on both desktop and mobile platforms, and is compatible with legacy browsers including Internet Explorer.
 
-Images can be imported either via local upload or through web URLs, with support for batch encryption/decryption, real-time preview of processing, and one-click download of all processed images. Individual files can also be downloaded separately. The interface is simple and efficient, offering language support in Chinese, English, and Japanese. 
+Images can be loaded via local upload or online URL. It supports batch encryption/decryption with real-time previews, and one-click download of all processed images to your local device for simple and efficient operation.
 
-Important notice: The author assumes no responsibility or liability for any losses, disputes, legal issues, or consequences arising from your use of this tool, especially those resulting from violations of applicable laws and regulations. Your use of this tool constitutes agreement to these terms; if you do not agree, please refrain from using it.
+Available in Chinese, English, and Japanese versions.
 
+Important Notice:Any losses, disputes, controversies, or legal liabilities arising from your use of this tool shall be the sole responsibility of the user, and the author of this tool shall not be held liable. By using this tool, you agree to the above terms; otherwise, please do not use it.
 
-
-# V3.0.0 : 
-> - 新增可修复受损加密图片的「调整尺寸」功能.(若已加密的图片因受到图片缩放或拉伸的破坏而无法解密出内容,使用「调整尺寸」功能将图片恢复至原有尺寸即可最大程度的解密出原有内容.)
-> - 图片像素尺寸显示功能.
-> - 用户界面优化
-
-# V2.0.0 : 
-> - 强化加密,每个像素块在加密后除了会重新排列外还会执行不同的翻转处理，提升加密安全性.
 
 ## 图片马赛克加密解密工具 
 
-这是一个图片加密/解密的工具,基于 HTML + JS,单文件,无需安装环境,可直接下载到本地用浏览器来运行.
+这是一个图片加密/解密的工具,基于 HTML + JS,单文件,无需安装,无需配置环境,无需网络连接,可直接使用浏览器运行全部功能,跨平台支持,手机浏览器也可直接运行.
 
-通过把图片按一定量的像素块数分割成相同大小的若干小块,.根据密码设定的不同将分割后的像素块按序打乱后重新拼接成与原图片尺寸,长宽比,像素数相等的新图片作为加密/解密的方法.(图片分割块数可设定,数值越高,加密强度越大.您设置的分割块数应尽可能的被图片宽与高的像素数整除以提供更好的加密效果.)
+通过把图片分割成最多像素数目的块数,根据密码设定的不同将分割后的块按序打乱后翻转并重新拼接成与原图片尺寸,宽高比,像素数相等的新图片作为加密/解密的方法.
 
-不同于普通的加密工具,加密后的图片仍为图片,只需用此工具输入正确的分割的块数与密码与即可解密出原有的图片内容,不受文件名变化,图片格式变化,一定程度的图片缩放及水印标记的影响.用于增加在网络上传播图片信息的隐私与安全性,尤其适合在允许用户免费上传图片内容的各大社交媒体平台上使用,可有效对抗不友善的第三方的窥视与审查,保护用户信息传递的自由与隐私.
+加密/解密的过程图片信息完全无损失,解密内容不受文件名变化,图片格式变化,一定程度的图片缩放及水印标记的影响.
 
-可通过本地上传或网络链接的方式导入图片,支持批量加密/解密,过程可实时预览,并支持一键将处理好的图片全部下载到本地.也可单个下载某个所选的文件.操作简单快捷,并提供中文,英文,日文三个语言的版本.
+不同于普通的加密工具,加密后的图片仍为图片,不受MIME类型限制.可用于增加在网络上传播图片信息的隐私与安全性,尤其适合在允许用户免费上传图片内容的各大社交媒体平台上使用,可有效对抗不友善的第三方的窥视与审查,保护用户信息传递的自由与隐私.
+
+可仅对图片局部特定区域加密,替代传统的不可恢复的各类图片修正.
+
+支持pc,移动端多平台运行,兼容包括IE在内的老旧浏览器.
+
+可通过本地上传或网络链接的方式加载图片,支持批量加密/解密,过程可实时预览,并支持一键将处理好的图片全部下载到本地,操作简单快捷.
+
+提供中文,英文,日文三个语言的版本.
 
 重要信息:您因使用此工具而产生的任何损失,纠纷,争议,及任何因违反法律法规所造成的责任与后果均与此工具的作者无关.当您使用此工具时即代表您同意上述协议,否则请不要使用此工具.
 
 
+## 画像モザイク暗号化・復号ツール
 
-# V3.0.0 :
-> - 暗号化された破損画像を修復できる「サイズ調整」機能を追加しました。
-（暗号化済みの画像が拡大縮小または引き伸ばしによって破損し、コンテンツを復号できなくなった場合、「サイズ調整」機能で画像を元のサイズに戻すことで、元のコンテンツを最大限復号することができます。）
-> - 画像ピクセルサイズ表示機能を追加しました。
-> - ユーザーインターフェース（UI）を最適化しました。
+これは HTML＋JS で開発された画像暗号化 / 復号ツールです。単一ファイルで構成され、インストール不要、環境設定不要、ネットワーク接続不要で、ブラウザで直接全機能を実行可能。クロスプラットフォームに対応し、スマホのブラウザでもそのまま使用できます。
 
-# V2.0.0 :
-> - 暗号化を強化。各ピクセルブロックは暗号化後、並び替えに加えて異なる反転処理が実行され、暗号化の安全性が向上します。
+画像を最大限のピクセル数のブロックに分割し、設定したパスワードに基づいて分割後のブロックをシャッフル・反転させ、元画像と同一のサイズ・縦横比・ピクセル数の新しい画像に再合成する方式で暗号化 / 復号を行います。
 
-## 画像モザイク暗号化復号化ツール 
+暗号化 / 復号の過程で画像情報は完全に損なわれず、復号結果はファイル名の変更、画像フォーマットの変更、一定範囲の拡大縮小、透かしの影響を受けません。
 
-これは、HTML + JSに基づく画像の暗号化/復号化ツールであり、単一ファイルで構成されており、インストール環境は不要で、直接ダウンロードしてローカルでブラウザで実行できます。
+通常の暗号化ツールと異なり、暗号化後のファイルは依然として画像形式であり、MIME タイプの制限を受けません。ネット上での画像情報伝達のプライバシーと安全性を高める用途に適し、特に無料で画像投稿が可能な各種ソーシャルメディアプラットフォームで有効です。悪意のある第三者の覗き見や検閲に対抗し、ユーザーの情報伝達の自由とプライバシーを保護します。
 
-画像を一定数のピクセルブロックに分割し、同じ大きさの複数の小ブロックにし、パスワードの設定に応じて分割後のピクセルブロックを順番に入れ替え、元の画像と同じサイズ、縦横比、ピクセル数の新しい画像を再構成することで暗号化/復号化を行います。（画像分割ブロック数は設定可能で、数値が高いほど暗号化強度が高まります。設定した分割ブロック数は、より優れた暗号化効果を得るため、できる限り画像の幅と高さのピクセル数で割り切れる値にしてください。）
+画像の特定の局部領域のみを暗号化でき、従来の回復不可能な画像修正処理に代わります。
 
-通常の暗号化ツールとは異なり、暗号化後の画像は依然として画像であり、このツールで正しい分割ブロック数とパスワードを入力するだけで、元の画像内容を復号化でき、ファイル名の変更、画像形式の変更、ある程度の画像の拡大縮小、およびウォーターマークの影響を受けません。インターネット上で画像情報を伝播する際のプライバシーとセキュリティを向上させるために使用され、特にユーザーが無料で画像コンテンツをアップロードできる各種ソーシャルメディアプラットフォームで使用するのに適しており、不親切な第三者の盗み見や審査に効果的に対抗し、ユーザーの情報伝達の自由とプライバシーを保護します。
+PC・モバイルのマルチプラットフォームで動作し、IE を含む旧式ブラウザにも対応します。
 
-画像はローカルアップロードまたはネットワークリンクでインポートでき、バッチ暗号化/復号化をサポートし、処理中はリアルタイムでプレビューでき、処理済みの画像を一括してローカルにダウンロードすることも、選択したファイルを単独でダウンロードすることもできます。操作は簡単で迅速で、中国語、英語、日本語の3つの言語バージョンを提供しています。
+ローカルアップロードまたはネットワーク URL から画像を読み込み可能。一括暗号化 / 復号に対応し、処理過程をリアルタイムプレビューでき、処理済み画像をワンクリックでローカルに一括ダウンロードでき、操作が簡単・迅速です。
 
-重要な情報：このツールの使用によって生じたいかなる損失、紛争、争議、および法律法規に違反することによる責任と結果は、このツールの作者とは一切関係ありません。このツールを使用することで、上記の協定に同意したことになります。同意しない場合は、このツールを使用しないでください。
+中国語・英語・日本語の 3 言語バージョンを提供します。
+
+重要事項:本ツールの使用により生じた損失、紛争、論争、及び法令違反による一切の責任と結果について、作者は一切責任を負いません。本ツールを使用した時点で上記規約に同意したものとみなされます。同意しない場合は使用しないでください。
