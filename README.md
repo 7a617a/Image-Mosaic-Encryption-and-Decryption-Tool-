@@ -8,7 +8,7 @@ The encryption/decryption process is completely lossless. The decrypted content 
 
 Unlike ordinary encryption tools, the encrypted output is still a valid image with no MIME type restrictions. It enhances the privacy and security of image-based information shared online, making it ideal for social media platforms that allow free image uploads. It effectively defends against unauthorized third-party surveillance and censorship, protecting users’ freedom of information exchange and privacy.
 
-It supports partial encryption of specific image areas, replacing traditional unrecoverable image censorship methods.
+It supports local encryption of specific image areas, replacing traditional unrecoverable image censorship methods.
 
 The tool runs on both desktop and mobile platforms, and is compatible with legacy browsers including Internet Explorer.
 
