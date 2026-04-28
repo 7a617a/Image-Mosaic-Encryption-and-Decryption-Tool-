@@ -1,0 +1,998 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像モザイク暗号化・復号化ツール</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+        body{max-width:1200px;margin:0 auto;background-color:#f5f5f5;}
+        .container{background:white;padding:10px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+        h1{text-align:center;margin-bottom:15px;color:#333;}
+        .guide-tip{background-color:#e8f4fd;padding:10px;border-radius:4px;font-size:12px;color:#0c5460;line-height:1.5;margin-bottom:8px;}
+        .guide-tip{display:flex;flex-wrap:wrap;justify-content:center;padding:10px 12px;}
+        .guide-item{display:flex;flex-shrink:0;}
+        #commonGuideContent{width:100%!important;margin-top:8px!important;}
+        .guide-header{cursor:pointer;display:flex;align-items:center;user-select:none;font-weight:bold;font-size:16px;}
+        .guide-content{margin-top:8px;display:none;}
+        .input-group{margin-bottom:10px;}
+        label{display:block;font-weight:bold;color:#555;}
+        input[type="file"]{padding:6px;border:1px solid #ddd;border-radius:4px;width:100%;margin-bottom:10px;}
+        input[type="text"],input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:4px;width:100%;max-width:590px;}
+        button{padding:8px 12px;background-color:#007bff;color:white;border:none;border-radius:4px;cursor:pointer;margin:5px 5px 0 0;}
+        button:hover{background-color:#0056b3;}
+        button:disabled{background-color:#6c757d;cursor:not-allowed;}
+        #decryptBtn{background-color:#10a704;}
+        #decryptBtn:hover{background-color:#10741d;}
+        .clear-all-btn{background-color:#6c757d;}
+        .clear-all-btn:hover{background-color:#c82333;}
+        .batch-actions{padding:12px;background-color:#f8f9fa;border-radius:4px;}
+        .image-grid{display:flex;flex-wrap:wrap;}
+        .image-card{flex:1 1 240px;min-width:45%;max-width:590px;background:#f8f9fa;padding:10px;border-radius:8px;border:1px solid #eee;position:relative;}
+        .remove-btn{position:absolute;top:10px;right:10px;padding:5px 10px;background-color:#c0c5c5;font-size:12px;margin:0;}
+        .remove-btn:hover{background-color:#c82333;}
+        .image-pair{display:flex;flex-wrap:wrap;}
+        .image-box{flex:1;min-width:200px;width:100%;position:relative;}
+        .image-box h3{margin-bottom:4px;color:#567;font-size:16px;}
+        .preview-img{max-width:100%;border:1px solid #ddd;max-height:478px;object-fit:contain;cursor:zoom-in;transition:all 0.2s ease;display:block;}
+        .preview-img:hover{box-shadow:0 0 8px rgba(0,123,255,0.5);}
+        .tip{color:#999;font-size:12px;margin-top:5px;}
+        .file-name{font-size:14px;color:#333;margin-bottom:4px;word-break:break-all;}
+        .single-download-btn{background-color:#28a745;margin-top:5px;}
+        .single-download-btn:hover{background-color:#218838;}
+        .batch-download-btn{background-color:#19a2b8;}
+        .batch-download-btn:hover{background-color:#138496;}
+        .url-input-group{display:flex;flex-wrap:wrap;align-items:flex-end;}
+        .url-input{flex:1;min-width:240px;}
+        .url-btn{background-color:#20c997;}
+        .url-btn:hover{background-color:#17a673;}
+        .error-tip{color:#dc3545;font-size:12px;margin-top:5px;display:none;}
+        #toastWrapper{position: fixed;top: 20px;right: 20px;z-index: 9999;display: flex;flex-direction: column;}
+        .toast{padding: 10px 20px;border-radius: 4px;color: white;font-size: 14px;max-width: 300px;word-wrap: break-word;opacity: 0;transform: translateY(-20px);transition: opacity 0.3s ease, transform 0.3s ease;}
+        .toast.show{opacity: 1;transform: translateY(0);}
+        .toast.success{background-color: #28a745;}
+        .toast.error{background-color: #dc3545;}
+        .toast.warning{background-color: #ffc107;color: #333;}
+        .toast.info{background-color: #17a2b8;}
+        .image-viewer{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.9);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
+        .image-viewer.show{display:flex;}
+        .viewer-content{position:relative;max-width:95%;max-height:95%;cursor:crosshair;}
+        .viewer-img{max-width:100%;max-height:90vh;object-fit:contain;display:block;transform-origin:center center;user-select:none;}
+        .viewer-close{position:fixed;top:20px;right:20px;width:40px;height:40px;border-radius:50%;background-color:rgba(104,103,109,0.8);color:white;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0;padding:0;opacity:0.5;z-index:10001;}
+        .viewer-close:hover{background-color:#c82333;opacity:1;}
+        .cross-line{position:absolute;background-color:#ff0000;opacity:0.8;z-index:10002;pointer-events:none;display:none;}
+        .horizontal-line{width:4096px;height:1px;left:-2048px;}
+        .vertical-line{height:4096px;width:1px;top:-2048px;}
+        .resize-controls{margin-top:4px;padding:4px;background:#f0f8ff;border-radius:4px;display:none;}
+        .resize-controls.show{display:block;}
+        .resize-input-group{display:flex;flex-wrap:wrap;margin-bottom:4px;}
+        .resize-input-group input{flex:1;min-width:60px;padding:4px;}
+        .aspect-ratio-group{margin-bottom:6px;font-size:12px;display:flex;align-items:center;}
+        .resize-btn{background-color:#ff9214;padding:6px 12px;font-size:12px;margin-top:0;}
+        .resize-btn:hover{background-color:#e07800;}
+        .confirm-resize-btn{background-color:#fd7e14;}
+        .confirm-resize-btn:hover{background-color:#e46c0a;}
+        .cancel-resize-btn{background-color:#6c757d;padding:6px 12px;font-size:12px;margin-top:0;}
+        .cancel-resize-btn:hover{background-color:#5a6268;}
+        .pixel-info{font-size:12px;color:#567;margin:4px 0;display:block;}
+        .local-controls{margin-top:4px;padding:4px;background:#f0f8ff;border-radius:4px;display:none;}
+        .local-controls.show{display:block;}
+        .local-input-group{display:flex;flex-wrap:wrap;margin-bottom:4px;}
+        .local-input-group input{flex:1;min-width:60px;padding:4px;}
+        .local-crop-group{margin-bottom:6px;font-size:12px;display:flex;align-items:center;}
+        .local-btn{background-color:#6f42c1;padding:6px 12px;font-size:12px;margin-top:0;}
+        .local-btn:hover{background-color:#5a328b;}
+        .confirm-local-btn{background-color:#6f42c1;}
+        .confirm-local-btn:hover{background-color:#5a328b;}
+        .cancel-local-btn{background-color:#6c757d;padding:6px 12px;font-size:12px;margin-top:0;}
+        .local-coords-locked{background-color:#e9ecef;color:#6c757d;cursor:not-allowed;}
+        .card-overlay-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+        .pixel-coord{position:absolute;background:rgba(0,0,0,0.8);color:#fff;padding:1px 4px;font-size:12px;border-radius:2px;z-index:10003;pointer-events:none;display:none;white-space:nowrap;}
+        .viewer-content.dragging{cursor:grabbing!important;cursor:-webkit-grabbing!important;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>画像モザイク暗号化・復号化ツール</h1>
+        <div class="guide-tip">
+            <div class="guide-item">
+                <div class="guide-header" onclick="toggleCommonGuide('guide')">操作ガイド ▶</div>
+            </div>
+            <div class="guide-item">
+                <div class="guide-header" onclick="toggleCommonGuide('about')">このツールについて ▶</div>
+            </div>
+            <div class="guide-content" id="commonGuideContent" style="display:none;width:100%;margin-top:8px;"></div>
+        </div>
+        <div class="input-group">
+            <label for="imageUrl">ネットワークURLから画像を読み込む</label>
+            <div class="url-input-group">
+                <input type="text" id="imageUrl" class="url-input" placeholder="画像URLを入力してください（例：https://xxx.com/xxx.jpg）">
+                <button id="loadUrlBtn" class="url-btn">ネットワーク画像を読み込む</button>
+            </div>
+            <p class="error-tip" id="urlErrorTip">URL形式が不正、または画像の読み込みに失敗しました！</p>
+        </div>
+        <div class="input-group">
+            <label for="imageFile">ローカル画像ファイルを選択</label>
+            <input type="file" id="imageFile" accept="image/*" multiple>
+            <button id="clearAllBtn" class="clear-all-btn">読み込んだ画像をすべてクリア</button>
+        </div>
+        <div class="input-group">
+            <label for="blockCount">分割ブロック数（1行/1列、画像の幅・高さを超えないこと）</label>
+            <input type="number" id="blockCount" placeholder="分割ブロック数を設定してください" value="32" min="1">
+        </div>
+        <div class="input-group">
+            <label for="secretKey">パスワード（任意の文字列）</label>
+            <input type="text" id="secretKey" placeholder="暗号化/復号化パスワードを入力してください" value="123456">
+        </div>
+        <div class="input-group">
+            <button id="encryptBtn">暗号化</button>
+            <button id="decryptBtn">復号化</button>
+            <button id="batchDownloadBtn" class="batch-download-btn" disabled>一括ダウンロード</button>
+        </div>
+        <div class="batch-actions" id="batchTip" style="display:none;">
+            <p>読み込み完了 <span id="fileCount">0</span> 枚の画像</p>
+        </div>
+        <div class="image-grid" id="imageGrid"></div>
+    </div>
+    <div id="toastWrapper"></div>
+    <div id="imageViewer" class="image-viewer">
+        <div class="viewer-content">
+            <button class="viewer-close" id="viewerCloseBtn">×</button>
+            <img src="" alt="拡大プレビュー" class="viewer-img" id="viewerImg">
+            <div class="cross-line horizontal-line" id="horizontalLine"></div>
+            <div class="cross-line vertical-line" id="verticalLine"></div>
+            <div id="pixelCoord" class="pixel-coord"></div>
+        </div>
+    </div>
+<script>
+if(!Array.from){Array.from=function(arr){var result=[];for(var i=0;i<arr.length;i++)result.push(arr[i]);return result;};}
+if(!String.prototype.startsWith){String.prototype.startsWith=function(str){return this.indexOf(str)===0;};}
+if(typeof Object.assign!='function'){
+    Object.assign=function(target){
+        if(target==null)throw new TypeError('Cannot convert undefined or null to object');
+        var to=Object(target);
+        for(var index=1;index<arguments.length;index++){
+            var next=arguments[index];
+            if(next!=null){
+                for(var key in next){
+                    if(Object.prototype.hasOwnProperty.call(next,key))to[key]=next[key];
+                }
+            }
+        }
+        return to;
+    };
+}
+if(!('classList'in HTMLElement.prototype)){
+    Object.defineProperty(HTMLElement.prototype,'classList',{
+        get:function(){
+            var el=this;
+            return{
+                add:function(cls){el.className+=' '+cls;},
+                remove:function(cls){el.className=el.className.replace(new RegExp('\\b'+cls+'\\b','g'),'');},
+                contains:function(cls){return new RegExp('\\b'+cls+'\\b').test(el.className);},
+                toggle:function(cls){this.contains(cls)?this.remove(cls):this.add(cls);}
+            };
+        }
+    });
+}
+function addEvent(el,type,fn){
+    if(el.addEventListener){el.addEventListener(type,fn,false);}
+    else if(el.attachEvent){el.attachEvent('on'+type,fn);}
+    else{el['on'+type]=fn;}
+}
+function removeEvent(el,type,fn){
+    if(el.removeEventListener){el.removeEventListener(type,fn,false);}
+    else if(el.detachEvent){el.detachEvent('on'+type,fn);}
+}
+function toggleCommonGuide(type){
+    var contentEl=document.getElementById('commonGuideContent');
+    var guideHeader=document.querySelectorAll('.guide-header');
+    var guideText={
+    guide:'1. 最初に画像を読み込み、暗号化時は分割ブロック数とパスワードを設定して「暗号化」をクリックすると暗号化が完了します。復号化時は正しい分割ブロック数とパスワードを入力して「復号化」をクリックすると復号化できます。<br>'+
+          '2. 画像をクリックするとプレビュー表示が可能です。プレビュー画像は拡大縮小・ドラッグ操作に対応し、画像上の任意の点のピクセル座標を取得することもできます。<br>'+
+          '3.「局部処理」機能を有効にすると、画像内の任意の矩形領域のみを暗号化・復号でき、従来の復元不可能な各種画像修正手法に代わります。左上と右下のピクセル座標を入力して処理領域の位置と形状を制御し、復号化時は暗号化時と同じ座標を入力して「確定」をクリックして領域を設定してください。<br>'+
+          '4. 分割ブロック数は、画像の幅と高さのピクセル数で割り切れる値に設定することを推奨します。割り切れない部分は暗号化の対象外となります。分割ブロック数が多いほど暗号化強度は高くなりますが、処理時間が大幅に長くなる場合があります。<br>'+
+          '5. 「領域を切り抜き」機能は、局部処理で選択した範囲を切り抜いた後に暗号化・復号を実行します。暗号情報が隠された画像から情報を抽出する際に利用できます。<br>'+
+          '6. ネットワーク画像の読み込みに失敗した場合、サイトが盗難防止設定をしている可能性があります。画像をローカルにダウンロードし、「ローカル画像アップロード」機能で読み込んでください。<br>'+
+          '7. 暗号化完了後、分割ブロック数、パスワード、局部処理時の座標は忘れないように暗号化後のファイル名に自動的に付加されます。注意：ファイル名またはパスワードが長すぎる、または特殊文字を含む場合はこの機能が無効になることがあります。<br>'+
+          '8. 暗号化済み画像が拡大縮小や伸縮で破損して復号化できない場合、「サイズ調整」機能で元のサイズに戻すと、元の内容を最大限復号化できます。<br>'+
+          '9. 本ツールをブックマークまたはお気に入りに登録すると、ブラウザからいつでもアクセスでき、より便利に利用できます。',
+    about:'プロジェクトアドレス: <a href="https://github.com/7a617a/Image-Mosaic-Encryption-and-Decryption-Tool-">https://github.com/7a617a/Image-Mosaic-Encryption-and-Decryption-Tool-</a><br>バージョン:10.5'
+};
+    for(var i=0;i<guideHeader.length;i++){var txt=guideHeader[i].textContent;guideHeader[i].textContent=txt.replace(' ▼',' ▶');}
+    if(activeGuideType===type){contentEl.style.display='none';activeGuideType='';return;}
+    activeGuideType=type;
+    contentEl.innerHTML=guideText[type];
+    contentEl.style.display='block';
+    var currentHeader=document.querySelector('.guide-header[onclick="toggleCommonGuide(\''+type+'\')"]');
+    currentHeader.textContent=currentHeader.textContent.replace(' ▶',' ▼');
+}
+var fileProcessData={};
+var imageIdCounter=0;
+var loadedImageCount=0;
+var viewerState={
+    scale:1,minScale:1,offsetX:0,offsetY:0,isDragging:false,
+    startX:0,startY:0,imgNaturalWidth:0,imgNaturalHeight:0,
+    currentImageId:null,lastTouchDistance:0,
+    isProcessedImage:false
+};
+var viewerContent,pixelCoord,horizontalLine,verticalLine;
+var activeGuideType='';
+var imageFile=document.getElementById('imageFile');
+var clearAllBtn=document.getElementById('clearAllBtn');
+var blockCountInput=document.getElementById('blockCount');
+var secretKeyInput=document.getElementById('secretKey');
+var encryptBtn=document.getElementById('encryptBtn');
+var decryptBtn=document.getElementById('decryptBtn');
+var batchDownloadBtn=document.getElementById('batchDownloadBtn');
+var imageGrid=document.getElementById('imageGrid');
+var batchTip=document.getElementById('batchTip');
+var fileCount=document.getElementById('fileCount');
+var imageUrlInput=document.getElementById('imageUrl');
+var loadUrlBtn=document.getElementById('loadUrlBtn');
+var urlErrorTip=document.getElementById('urlErrorTip');
+var toastContainer=document.getElementById('toastContainer');
+var imageViewer=document.getElementById('imageViewer');
+var viewerImg=document.getElementById('viewerImg');
+var viewerCloseBtn=document.getElementById('viewerCloseBtn');
+function hideOtherControls(imageId,excludeType){
+    if(excludeType!=='resize')hideResizeControls(imageId);
+    if(excludeType!=='local')hideLocalControls(imageId);
+}
+function showLocalControls(imageId){
+    hideOtherControls(imageId,'local');
+    var d=fileProcessData[imageId];
+    if(!d)return;
+    var controls=document.getElementById('localControls_'+imageId);
+    var u1=document.getElementById('localu1_'+imageId);
+    var v1=document.getElementById('localv1_'+imageId);
+    var u2=document.getElementById('localu2_'+imageId);
+    var v2=document.getElementById('localv2_'+imageId);
+    var crop=document.getElementById('localCrop_'+imageId);
+    if(!d.localCoordsLocked){
+        u1.value=0;v1.value=0;
+        u2.value=d.originalCanvas.width;v2.value=d.originalCanvas.height;
+        crop.checked=false;
+    }
+    u1.disabled=v1.disabled=u2.disabled=v2.disabled=crop.disabled=d.localCoordsLocked;
+    u1.className=v1.className=u2.className=v2.className=d.localCoordsLocked?'local-coords-locked':'';
+    controls.classList.add('show');
+    drawCardOverlay(imageId);
+}
+function hideLocalControls(imageId){
+    var controls=document.getElementById('localControls_'+imageId);
+    if(controls)controls.classList.remove('show');
+}
+function createCanvasPair(imageId){
+    return{
+        id:imageId,originalCanvas:document.createElement('canvas'),
+        processedCanvas:document.createElement('canvas'),originalImageData:null,
+        blockSize:{width:0,height:0},validSize:{width:0,height:0},
+        isProcessed:false,isEncrypt:false,file:null,isFromUrl:false,
+        cardElement:null,originalImageSrc:'',processedImageSrc:'',
+        originalWidth:0,originalHeight:0,aspectRatio:0,
+        localu1:0,localv1:0,localu2:0,localv2:0,
+        localCrop:false,localProcessEnabled:false,localCoordsLocked:false
+    };
+}
+function createImageCard(imageId,fileData,fileName){
+    var card=document.createElement('div');
+    card.className='image-card';
+    card.innerHTML=
+        '<button class="remove-btn" data-image-id="'+imageId+'">X</button>'+
+        '<div class="file-name">'+fileName+'</div>'+
+        '<div class="image-pair">'+
+            '<div class="image-box">'+
+                '<h3>処理前画像</h3>'+
+                '<img id="originalImage_'+imageId+'" src="" alt="処理前画像" class="preview-img" style="display:none;">'+
+                '<canvas id="cardOverlayCanvas_'+imageId+'" class="card-overlay-canvas"></canvas>'+
+                '<span id="pixelInfo_'+imageId+'" class="pixel-info"></span>'+
+                '<button id="resizeBtn_'+imageId+'" class="resize-btn">サイズ調整</button>'+
+                '<button id="localProcessBtn_'+imageId+'" class="local-btn">局部処理</button>'+
+                '<div id="resizeControls_'+imageId+'" class="resize-controls">'+
+                    '<div class="resize-input-group">'+
+                        '<label>幅:</label>'+
+                        '<input type="number" id="resizeWidth_'+imageId+'" min="1" placeholder="幅">'+
+                        '<label>高さ:</label>'+
+                        '<input type="number" id="resizeHeight_'+imageId+'" min="1" placeholder="高さ">'+
+                    '</div>'+
+                    '<div class="aspect-ratio-group">'+
+                        '<input type="checkbox" id="keepAspect_'+imageId+'" checked>'+
+                        '<label for="keepAspect_'+imageId+'">縦横比を保持</label>'+
+                    '</div>'+
+                    '<button id="confirmResize_'+imageId+'" class="confirm-resize-btn resize-btn">調整を確定</button>'+
+                    '<button id="cancelResize_'+imageId+'" class="cancel-resize-btn">キャンセル</button>'+
+                '</div>'+
+                '<div id="localControls_'+imageId+'" class="local-controls">'+
+                    '<div class="local-input-group">'+
+                        '<label>左上座標:</label>'+
+                        '<input type="number" id="localu1_'+imageId+'" min="0" placeholder="左上u1">'+
+                        '<input type="number" id="localv1_'+imageId+'" min="0" placeholder="左上v1">'+
+                        '</div>'+
+                    '<div class="local-input-group">'+
+                        '<label>右下座標:</label>'+
+                        '<input type="number" id="localu2_'+imageId+'" min="0" placeholder="右下u2">'+
+                        '<input type="number" id="localv2_'+imageId+'" min="0" placeholder="右下v2">'+
+                    '</div>'+
+                    '<div class="local-crop-group">'+
+                        '<input type="checkbox" id="localCrop_'+imageId+'">'+
+                        '<label for="localCrop_'+imageId+'">領域を切り抜き（選択領域のみ出力）</label>'+
+                    '</div>'+
+                    '<button id="confirmLocal_'+imageId+'" class="confirm-local-btn local-btn">確定</button>'+
+                    '<button id="cancelLocal_'+imageId+'" class="cancel-local-btn">キャンセル</button>'+
+                '</div>'+
+            '</div>'+
+            '<div class="image-box">'+
+                '<h3>処理後画像</h3>'+
+                '<img id="processedImage_'+imageId+'" src="" alt="処理後画像" class="preview-img" style="display:none;">'+
+                '<p class="tip">未処理</p>'+
+                '<button id="singleDownloadBtn_'+imageId+'" class="single-download-btn" disabled>この画像をダウンロード</button>'+
+            '</div>'+
+        '</div>';
+    fileData.cardElement=card;
+    imageGrid.appendChild(card);
+    addEvent(card.querySelector('.remove-btn'),'click',function(){removeImage(imageId);});
+    addEvent(document.getElementById('singleDownloadBtn_'+imageId),'click',function(){downloadSingleImage(imageId);});
+    addEvent(document.getElementById('resizeBtn_'+imageId),'click',function(){showResizeControls(imageId);});
+    addEvent(document.getElementById('cancelResize_'+imageId),'click',function(){hideResizeControls(imageId);});
+    addEvent(document.getElementById('confirmResize_'+imageId),'click',function(){resizeImage(imageId);});
+    addEvent(document.getElementById('resizeWidth_'+imageId),'input',function(){handleAspectRatio(imageId,true);});
+    addEvent(document.getElementById('resizeHeight_'+imageId),'input',function(){handleAspectRatio(imageId,false);});
+    addEvent(document.getElementById('keepAspect_'+imageId),'change',function(){handleAspectRatio(imageId,true);});
+    addEvent(document.getElementById('localProcessBtn_'+imageId),'click',function(){showLocalControls(imageId);});
+    addEvent(document.getElementById('confirmLocal_'+imageId),'click',function(){confirmLocalProcess(imageId);});
+    addEvent(document.getElementById('cancelLocal_'+imageId),'click',function(){cancelLocalProcess(imageId);});
+}
+function handleImageLoaded(img,imageId,fileData){
+    fileData.originalCanvas.width=img.width;
+    fileData.originalCanvas.height=img.height;
+    fileData.processedCanvas.width=img.width;
+    fileData.processedCanvas.height=img.height;
+    fileData.originalWidth=img.width;
+    fileData.originalHeight=img.height;
+    fileData.aspectRatio=img.width/img.height;
+    fileData.localu2=img.width;
+    fileData.localv2=img.height;
+    var ctx=fileData.originalCanvas.getContext('2d');
+    ctx.drawImage(img,0,0);
+    fileData.originalImageData=ctx.getImageData(0,0,img.width,img.height);
+    var originalImg=document.getElementById('originalImage_'+imageId);
+    originalImg.src=img.src;
+    originalImg.style.display='block';
+    updatePixelInfo(imageId,img.width,img.height);
+    fileData.originalImageSrc=img.src;
+    addEvent(originalImg,'click',function(){openImageViewer(img.src,imageId,false);});
+    addEvent(document.getElementById('processedImage_'+imageId),'click',function(){this.src?openImageViewer(this.src,imageId,true):showToast('未処理のためプレビューできません','warning');});
+    fileProcessData[imageId]=fileData;
+    loadedImageCount++;
+    updateFileCount();
+    drawCardOverlay(imageId);
+}
+function processSingleImage(imageId,isDecrypt){
+    var d=fileProcessData[imageId];
+    if(!d||!d.originalImageData){showToast('画像が読み込まれていません','error');return false;}
+    var bc=+blockCountInput.value;
+    if(bc<1||isNaN(bc)||Math.floor(bc)<bc){showToast('ブロック数は正の整数である必要があります','error');return false;}
+    var key=secretKeyInput.value.trim();
+    if(!key){showToast('パスワードを入力してください','error');return false;}
+    var useLocal=d.localProcessEnabled;
+    var lu1=useLocal?d.localu1:0;
+    var lv1=useLocal?d.localv1:0;
+    var lu2=useLocal?d.localu2:d.originalImageData.width;
+    var lv2=useLocal?d.localv2:d.originalImageData.height;
+    var crop=useLocal?d.localCrop:false;
+    var processWidth=lu2-lu1;
+    var processHeight=lv2-lv1;
+    if(bc>d.originalImageData.width||bc>d.originalImageData.height){showToast('ブロック数は画像の幅または高さを超えることはできません','error');return false;}
+    if(processWidth<bc||processHeight<bc){showToast('ブロック数は領域の幅または高さを超えることはできません','error');return false;}
+    var validProcessW=Math.floor(processWidth/bc)*bc;
+    var validProcessH=Math.floor(processHeight/bc)*bc;
+    var offsetX=lu1;var offsetY=lv1;
+    d.validSize.width=validProcessW;d.validSize.height=validProcessH;
+    d.blockSize.width=validProcessW/bc;d.blockSize.height=validProcessH/bc;
+    var total=bc*bc;
+    var seq=getShuffledIndexArray(total,key,isDecrypt);
+    var ctxTemp=d.originalCanvas.getContext('2d');
+    var outputCanvas=d.processedCanvas;
+    var outputCtx=outputCanvas.getContext('2d');
+    var outputWidth,outputHeight;
+    if(crop&&useLocal){
+        outputWidth=processWidth;outputHeight=processHeight;
+    }else{
+        outputWidth=d.originalImageData.width;outputHeight=d.originalImageData.height;
+    }
+    outputCanvas.width=outputWidth;outputCanvas.height=outputHeight;
+    if(!crop||!useLocal){
+        outputCtx.drawImage(d.originalCanvas,0,0);
+    }else{
+        outputCtx.drawImage(d.originalCanvas,offsetX,offsetY,processWidth,processHeight,0,0,processWidth,processHeight);
+    }
+    var newData=ctxTemp.createImageData(validProcessW,validProcessH);
+    var localImageData=ctxTemp.getImageData(offsetX,offsetY,validProcessW,validProcessH);
+    for(var i=0;i<total;i++){
+        var tIdx=isDecrypt?i:seq[i];
+        var type=getBlockTransformType(tIdx,key,total);
+        var sRow=Math.floor(i/bc),sCol=i%bc;
+        var tRow=Math.floor(seq[i]/bc),tCol=seq[i]%bc;
+        copyAndTransformBlock(
+            localImageData,newData,
+            sCol*d.blockSize.width,sRow*d.blockSize.height,
+            tCol*d.blockSize.width,tRow*d.blockSize.height,
+            d.blockSize.width,d.blockSize.height,type
+        );
+    }
+    crop&&useLocal?outputCtx.putImageData(newData,0,0):outputCtx.putImageData(newData,offsetX,offsetY);
+    d.isProcessed=true;d.isEncrypt=!isDecrypt;d.blockCount=bc;d.secretKey=key;
+    var pImg=document.getElementById('processedImage_'+imageId);
+    pImg.src=outputCanvas.toDataURL('image/png');
+    pImg.style.display='block';
+    pImg.nextElementSibling.textContent=isDecrypt?(useLocal?'局部復号化済':'復号化済'):(useLocal?'局部暗号化済':'暗号化済');
+    document.getElementById('singleDownloadBtn_'+imageId).disabled=false;
+    return true;
+}
+function batchProcessImages(isDecrypt){
+    var ids=Object.keys(fileProcessData);
+    if(!ids.length){showToast('画像を読み込んでください','warning');return;}
+    var c=0;
+    for(var i=0;i<ids.length;i++)if(processSingleImage(+ids[i],isDecrypt))c++;
+    if(c>0){batchDownloadBtn.disabled=false;showToast(c+'枚の処理に成功しました','success');}
+}
+function sanitizeFileName(name){return name.replace(/[\\/:*?"<>|]/g,'_').trim();}
+function generateProcessedFileName(originalName,blockCount,secretKey,isEncrypt,localCoords){
+    var baseName=originalName.substring(0,originalName.lastIndexOf('.'))||originalName;
+    var ext='.png';
+    var sanitizedKey=sanitizeFileName(secretKey);
+    var prefix=isEncrypt?'e':'d';
+    var localPart='';
+    if(localCoords&&localCoords.enabled===true){
+        localPart='_'+localCoords.u1+','+localCoords.v1+'_'+localCoords.u2+','+localCoords.v2;
+    }
+    return baseName+'_'+prefix+localPart+'_blocks'+blockCount+'_key'+sanitizedKey+ext;
+}
+function dataURLtoBlob(dataURL){
+    var arr=dataURL.split(',');
+    var mime='image/png';
+    var bstr=atob(arr[1]);
+    var n=bstr.length;
+    var u8arr=new Uint8Array(n);
+    while(n--){
+        u8arr[n]=bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr],{type:mime});
+}
+function downloadSingleImage(imageId){
+    var d=fileProcessData[imageId];
+    if(!d||!d.isProcessed){showToast('未処理です','warning');return;}
+    var localCoords={
+        enabled:d.localProcessEnabled,
+        u1:d.localu1,
+        v1:d.localv1,
+        u2:d.localu2,
+        v2:d.localv2
+    };
+    var fileName=generateProcessedFileName(d.file.name,d.blockCount,d.secretKey,d.isEncrypt,localCoords);
+    var dataURL=d.processedCanvas.toDataURL('image/png');
+    var blob=dataURLtoBlob(dataURL);
+    if(window.navigator&&window.navigator.msSaveOrOpenBlob){
+        window.navigator.msSaveOrOpenBlob(blob,fileName);
+        blob=null;
+        return;
+    }
+    var blobUrl=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.target='_blank';
+    a.href=blobUrl;
+    a.download=fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    a=null;
+}
+function batchDownloadImages(){
+    var ids=Object.keys(fileProcessData).filter(function(id){return fileProcessData[id].isProcessed;});
+    if(!ids.length){showToast('処理完了した画像がありません','warning');return;}
+    ids.forEach(function(id,i){setTimeout(function(){downloadSingleImage(id);},i*500);});
+    showToast(ids.length+'枚のダウンロードを開始します','info');
+}
+function removeImage(imageId){
+    var d=fileProcessData[imageId];
+    if(!d)return;
+    if(viewerState.currentImageId===imageId){closeImageViewer();}
+    if(d.processedImageSrc&&d.processedImageSrc.indexOf('blob:')===0){URL.revokeObjectURL(d.processedImageSrc);}
+    if(d.originalImageSrc&&d.originalImageSrc.indexOf('blob:')===0){URL.revokeObjectURL(d.originalImageSrc);}
+    function clearCanvas(canvas){
+        if(!canvas)return;
+        var ctx=canvas.getContext('2d');
+        if(ctx)ctx.clearRect(0,0,canvas.width,canvas.height);
+        canvas.width=1;
+        canvas.height=1;
+        canvas.getContext=function(){};
+        canvas.toDataURL=function(){};
+    }
+    clearCanvas(d.originalCanvas);
+    clearCanvas(d.processedCanvas);
+    var overlayCanvas=document.getElementById('cardOverlayCanvas_'+imageId);
+    if(overlayCanvas)clearCanvas(overlayCanvas);
+    var originalImg=document.getElementById('originalImage_'+imageId);
+    var processedImg=document.getElementById('processedImage_'+imageId);
+    if(originalImg){
+        removeEvent(originalImg,'click',originalImg.onclick);
+        originalImg.onload=null;
+        originalImg.onerror=null;
+        originalImg.src='';
+    }
+    if(processedImg){
+        removeEvent(processedImg,'click',processedImg.onclick);
+        processedImg.onload=null;
+        processedImg.onerror=null;
+        processedImg.src='';
+    }
+    if(d.cardElement){
+        var btns=d.cardElement.querySelectorAll('button');
+        var inputs=d.cardElement.querySelectorAll('input');
+        for(var i=0;i<btns.length;i++){
+            removeEvent(btns[i],'click',btns[i].onclick);
+            btns[i].onclick=null;
+        }
+        for(var i=0;i<inputs.length;i++){
+            removeEvent(inputs[i],'input',inputs[i].oninput);
+            removeEvent(inputs[i],'change',inputs[i].onchange);
+            inputs[i].oninput=null;
+            inputs[i].onchange=null;
+        }
+    }
+    if(d.cardElement&&d.cardElement.parentNode){d.cardElement.parentNode.removeChild(d.cardElement);}
+    d.originalCanvas=null;
+    d.processedCanvas=null;
+    d.originalImageData=null;
+    d.file=null;
+    d.cardElement=null;
+    d.blockSize=null;
+    d.validSize=null;
+    d.originalImageSrc=null;
+    d.processedImageSrc=null;
+    delete fileProcessData[imageId];
+    loadedImageCount--;
+    updateFileCount();
+    resetFileInput();
+    if(loadedImageCount===0){
+        batchDownloadBtn.disabled=true;
+        viewerState={
+            scale:1,minScale:1,offsetX:0,offsetY:0,isDragging:false,
+            startX:0,startY:0,imgNaturalWidth:0,imgNaturalHeight:0,
+            currentImageId:null,lastTouchDistance:0,isProcessedImage:false
+        };
+    }
+}
+function clearAllImages(){
+    if(!loadedImageCount){
+        showToast('画像がありません','info');
+        return;
+    }
+    if(!confirm('すべての画像をクリアしてもよろしいですか？'))return;
+    var imageIds=Object.keys(fileProcessData);
+    for(var i=0;i<imageIds.length;i++){removeImage(Number(imageIds[i]));}
+    fileProcessData={};
+    loadedImageCount=0;
+    imageIdCounter=0;
+    resetFileInput();
+    updateFileCount();
+    batchDownloadBtn.disabled=true;
+    showToast('すべての画像をクリアしました','success');
+}
+function resetFileInput(){imageFile.value='';}
+function updateFileCount(){fileCount.textContent=loadedImageCount;batchTip.style.display=loadedImageCount>0?'block':'none';}
+function confirmLocalProcess(imageId){
+    var d=fileProcessData[imageId];
+    if (d.localProcessEnabled) return;
+    var u1=+document.getElementById('localu1_'+imageId).value;
+    var v1=+document.getElementById('localv1_'+imageId).value;
+    var u2=+document.getElementById('localu2_'+imageId).value;
+    var v2=+document.getElementById('localv2_'+imageId).value;
+    var w=d.originalCanvas.width,h=d.originalCanvas.height;
+    if(isNaN(u1)||isNaN(v1)||isNaN(u2)||isNaN(v2)||Math.floor(u1)<u1||Math.floor(v1)<v1||Math.floor(u2)<u2||Math.floor(v2)<v2){showToast('座標は整数である必要があります','error');return false;}
+    if(u1<0||v1<0||u2<0||v2<0){showToast('座標は0未満にできません','error');return false;}
+    if(u1>w||v1>h||u2>w||v2>h){showToast('座標は画像サイズを超えることはできません','error');return false;}
+    if(u2<=u1||v2<=v1){showToast('右下座標は左上座標より大きくする必要があります','error');return false;}
+    var crop=document.getElementById('localCrop_'+imageId).checked;
+    d.localu1=u1;d.localv1=v1;d.localu2=u2;d.localv2=v2;
+    d.localCrop=crop;d.localProcessEnabled=true;d.localCoordsLocked=true;
+    var inputs=[
+        document.getElementById('localu1_'+imageId),document.getElementById('localv1_'+imageId),
+        document.getElementById('localu2_'+imageId),document.getElementById('localv2_'+imageId),
+        document.getElementById('localCrop_'+imageId)
+    ];
+    for(var i=0;i<inputs.length;i++){inputs[i].disabled=true;inputs[i].className='local-coords-locked';}
+    showToast('局部処理領域を設定しました','success');
+    drawCardOverlay(imageId);
+}
+function cancelLocalProcess(imageId) {
+    var d = fileProcessData[imageId];
+    if (!d) return;
+    if (!d.localProcessEnabled) {hideLocalControls(imageId);return;}
+    d.localProcessEnabled = false; d.localCoordsLocked = false;
+    var u1 = document.getElementById('localu1_' + imageId);
+    var v1 = document.getElementById('localv1_' + imageId);
+    var u2 = document.getElementById('localu2_' + imageId);
+    var v2 = document.getElementById('localv2_' + imageId);
+    var crop = document.getElementById('localCrop_' + imageId);
+    var inputs = [u1, v1, u2, v2, crop];
+    for (var i = 0; i < inputs.length; i++) { inputs[i].disabled = false; inputs[i].className = ''; }
+    showToast('局部処理をキャンセルしました','info');
+    drawCardOverlay(imageId);
+}
+function drawCardOverlay(imageId){
+    var d=fileProcessData[imageId];
+    var canvas=document.getElementById('cardOverlayCanvas_'+imageId);
+    var img=document.getElementById('originalImage_'+imageId);
+    if(!canvas||!img)return;
+    img.onload=function(){
+        var imgRect=img.getBoundingClientRect();
+        var containerRect=canvas.parentElement.getBoundingClientRect();
+        canvas.width=canvas.parentElement.clientWidth;
+        canvas.height=canvas.parentElement.clientHeight;
+        var ctx=canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        if(!d.localProcessEnabled)return;
+        var imgContentLeft=imgRect.left-containerRect.left;
+        var imgContentTop=imgRect.top-containerRect.top;
+        var imgContentWidth=imgRect.width;
+        var imgContentHeight=imgRect.height;
+        var scaleX=imgContentWidth/d.originalCanvas.width;
+        var scaleY=imgContentHeight/d.originalCanvas.height;
+        var x=imgContentLeft+d.localu1*scaleX;
+        var y=imgContentTop+d.localv1*scaleY;
+        var w=(d.localu2-d.localu1)*scaleX;
+        var h=(d.localv2-d.localv1)*scaleY;
+        ctx.strokeStyle='#00ff00';
+        ctx.lineWidth=1;
+        ctx.strokeRect(x,y,w,h);
+    };
+    if(img.complete)img.onload();
+}
+function updateCrossAndCoord(clientX,clientY){
+    var imgRect=viewerImg.getBoundingClientRect();
+    var inImage=clientX>=imgRect.left&&clientX<=imgRect.right&&clientY>=imgRect.top&&clientY<=imgRect.bottom;
+    if(!inImage){
+        horizontalLine.style.display='none';
+        verticalLine.style.display='none';
+        pixelCoord.style.display='none';
+        return;
+    }
+    horizontalLine.style.display='block';
+    verticalLine.style.display='block';
+    pixelCoord.style.display='block';
+    var contentRect=viewerContent.getBoundingClientRect();
+    var relX=clientX-contentRect.left;
+    var relY=clientY-contentRect.top;
+    horizontalLine.style.top=relY+'px';
+    verticalLine.style.left=relX+'px';
+    var realWidth,realHeight;
+    var realImgData=fileProcessData[viewerState.currentImageId];
+    if(realImgData){
+        if(viewerState.isProcessedImage){
+            realWidth=realImgData.processedCanvas.width;
+            realHeight=realImgData.processedCanvas.height;
+        }else{
+            realWidth=realImgData.originalCanvas.width;
+            realHeight=realImgData.originalCanvas.height;
+        }
+    }
+    var imgScaleX=imgRect.width/realWidth;
+    var imgScaleY=imgRect.height/realHeight;
+    var u=Math.floor((clientX-imgRect.left)/imgScaleX);
+    var v=Math.floor((clientY-imgRect.top)/imgScaleY);
+    pixelCoord.textContent=u+', '+v;
+    pixelCoord.style.left=(relX+15)+'px';
+    pixelCoord.style.top=(relY+15)+'px';
+}
+function openImageViewer(src,imageId,isProcessed){
+    viewerState.currentImageId=imageId;
+    viewerState.isProcessedImage=!!isProcessed;
+    viewerImg.src=src;
+    viewerImg.onload=function(){
+        viewerState.imgNaturalWidth=viewerImg.naturalWidth;
+        viewerState.imgNaturalHeight=viewerImg.naturalHeight;
+        viewerState.scale=1;
+        viewerState.offsetX=0;
+        viewerState.offsetY=0;
+        viewerImg.style.transform='translate(0px, 0px) scale(1)';
+        horizontalLine.style.display='none';
+        verticalLine.style.display='none';
+        pixelCoord.style.display='none';
+    };
+    imageViewer.classList.add('show');
+    document.body.style.overflow='hidden';
+    history.pushState({viewer:true},'');
+}
+function closeImageViewer(){
+    imageViewer.classList.remove('show');
+    viewerImg.src='';
+    viewerImg.onload=null;
+    viewerImg.onerror=null;
+    horizontalLine.style.display='none';
+    verticalLine.style.display='none';
+    pixelCoord.style.display='none';
+    document.body.style.overflow='';
+    viewerState={
+        scale:1,minScale:1,offsetX:0,offsetY:0,isDragging:false,
+        startX:0,startY:0,imgNaturalWidth:0,imgNaturalHeight:0,
+        currentImageId:null,lastTouchDistance:0,isProcessedImage:false
+    };
+}
+function getShuffledIndexArray(count,key,isDecrypt){
+    isDecrypt=isDecrypt||false;
+    var seed=314159265;
+    for(var i=0;i<key.length;i++){var c=key.charCodeAt(i);seed=((seed*7654321)^(c*(i+1)*1009))+count;seed=seed%2147483647;}
+    function secureRandom(){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)/4294967296;}
+    var indexArray=[];
+    for(var i=0;i<count;i++)indexArray.push(i);
+    var result=indexArray.slice();
+    for(var i=result.length-1;i>0;i--){
+        var j=Math.floor(secureRandom()*(i+1));
+        var temp=result[i];
+        result[i]=result[j];
+        result[j]=temp;
+    }
+    if(isDecrypt){
+        var reverseArray=new Array(count);
+        for(var i=0;i<count;i++)reverseArray[result[i]]=i;
+        return reverseArray;
+    }
+    return result;
+}
+function getBlockTransformType(blockIndex,key,totalBlocks){
+    var hash=blockIndex;
+    for(var i=0;i<key.length;i++){
+        var c=key.charCodeAt(i);
+        hash+=c;
+        hash+=hash<<10;
+        hash^=hash>>>6;
+    }
+    hash+=hash<<3;
+    hash^=hash>>>11;
+    hash+=hash<<15;
+    return(hash>>>0)%4;
+}
+function transformBlockData(blockData,blockWidth,blockHeight,transformType,isDecrypt){
+    var pixelCount=blockWidth*blockHeight*4;
+    var newBlock;
+    if(window.Uint8ClampedArray){
+        newBlock=new Uint8ClampedArray(pixelCount);
+    }else{
+        newBlock=new Array(pixelCount);
+        for(var i=0;i<pixelCount;i++){
+            newBlock[i]=0;
+        }
+    }
+    for(var y=0;y<blockHeight;y++){
+        for(var x=0;x<blockWidth;x++){
+            var nx=x,ny=y;
+            switch(transformType){
+                case 0:break;
+                case 1:nx=blockWidth-1-x;break;
+                case 2:ny=blockHeight-1-y;break;
+                case 3:nx=blockWidth-1-x;ny=blockHeight-1-y;break;
+            }
+            var src=(ny*blockWidth+nx)*4;
+            var dst=(y*blockWidth+x)*4;
+            newBlock[dst]=blockData[src];
+            newBlock[dst+1]=blockData[src+1];
+            newBlock[dst+2]=blockData[src+2];
+            newBlock[dst+3]=blockData[src+3];
+        }
+    }
+    return newBlock;
+}
+function copyAndTransformBlock(srcData,destData,srcX,srcY,destX,destY,w,h,type,isDecrypt){
+    var srcW=srcData.width;
+    var destW=destData.width;
+    var pixelCount=w*h*4;
+    var block;
+    if(window.Uint8ClampedArray){
+        block=new Uint8ClampedArray(pixelCount);
+    }else{
+        block=new Array(pixelCount);
+        for(var i=0;i<pixelCount;i++){
+            block[i]=0;
+        }
+    }
+    for(var y=0;y<h;y++){
+        for(var x=0;x<w;x++){
+            var sIdx=((srcY+y)*srcW+(srcX+x))*4;
+            var dIdx=(y*w+x)*4;
+            block[dIdx]=srcData.data[sIdx];
+            block[dIdx+1]=srcData.data[sIdx+1];
+            block[dIdx+2]=srcData.data[sIdx+2];
+            block[dIdx+3]=srcData.data[sIdx+3];
+        }
+    }
+    var transformed=transformBlockData(block,w,h,type,isDecrypt);
+    for(var y=0;y<h;y++){
+        for(var x=0;x<w;x++){
+            var dIdx=((destY+y)*destW+(destX+x))*4;
+            var bIdx=(y*w+x)*4;
+            destData.data[dIdx]=transformed[bIdx];
+            destData.data[dIdx+1]=transformed[bIdx+1];
+            destData.data[dIdx+2]=transformed[bIdx+2];
+            destData.data[dIdx+3]=transformed[bIdx+3];
+        }
+    }
+}
+function showToast(msg, type) {
+    type = type || 'info';
+    var wrapper = document.getElementById('toastWrapper');
+    if (!wrapper) return;
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.textContent = msg;
+    wrapper.appendChild(toast);
+    toast.classList.add('show');
+    setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(function() {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 100);
+    }, 3000);
+}
+function validateImageUrl(url){
+    if(!url)return false;
+    url=url.trim();
+    return /^(https?:\/\/).+/i.test(url)&&!/\.html?$/i.test(url);
+}
+function handleAspectRatio(id,isWidth){
+    var d=fileProcessData[id];if(!d||!d.aspectRatio)return;
+    var w=document.getElementById('resizeWidth_'+id);var h=document.getElementById('resizeHeight_'+id);
+    if(!document.getElementById('keepAspect_'+id).checked)return;
+    isWidth?h.value=Math.round(+w.value/d.aspectRatio):w.value=Math.round(+h.value/d.aspectRatio);
+}
+function showResizeControls(id){
+    hideOtherControls(id,'resize');
+    var d=fileProcessData[id];
+    if(d){
+        document.getElementById('resizeWidth_'+id).value=d.originalCanvas.width;
+        document.getElementById('resizeHeight_'+id).value=d.originalCanvas.height;
+    }
+    document.getElementById('resizeControls_'+id).classList.add('show');
+    drawCardOverlay(id);
+}
+function hideResizeControls(id){document.getElementById('resizeControls_'+id).classList.remove('show');drawCardOverlay(id);}
+function resizeImage(id){
+    var d=fileProcessData[id];
+    if(d&&d.localProcessEnabled){cancelLocalProcess(id);}
+    if(!d){showToast('データエラー','error');return;}
+    var w=+document.getElementById('resizeWidth_'+id).value;var h=+document.getElementById('resizeHeight_'+id).value;
+    if(isNaN(w)||isNaN(h)||w<1||h<1){showToast('サイズが無効です','error');return;}
+    var img=new Image();img.src=d.originalImageSrc;
+    img.onload=function(){
+        d.originalCanvas.width=w;d.originalCanvas.height=h;
+        var ctx=d.originalCanvas.getContext('2d');ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+        d.originalImageData=ctx.getImageData(0,0,w,h);
+        document.getElementById('originalImage_'+id).src=d.originalCanvas.toDataURL('image/png');
+        updatePixelInfo(id,w,h);d.processedCanvas.width=w;d.processedCanvas.height=h;d.isProcessed=false;
+        var p=document.getElementById('processedImage_'+id);p.src='';p.style.display='none';p.nextElementSibling.textContent='未処理';
+        document.getElementById('singleDownloadBtn_'+id).disabled=true;hideResizeControls(id);showToast('サイズ調整に成功しました','success');
+        drawCardOverlay(id);
+    };
+    img.onerror=function(){showToast('調整に失敗しました','error');};
+}
+function updatePixelInfo(id,w,h){document.getElementById('pixelInfo_'+id).textContent='ピクセルサイズ：'+w+' × '+h;}
+function loadImageFromUrl(){
+    var url=imageUrlInput.value.trim();urlErrorTip.style.display='none';
+    if(!validateImageUrl(url)){urlErrorTip.textContent='URL形式が不正です！';urlErrorTip.style.display='block';return;}
+    var id=imageIdCounter++;
+    var data=createCanvasPair(id);
+    data.isFromUrl=true;
+    data.file={name:'ネットワーク画像_'+(id+1)};
+    var showName=url.length>50?url.substring(0,50)+'...':url;
+    createImageCard(id,data,'ネットワーク画像：'+showName);
+    var img=new Image();
+    try{img.crossOrigin='anonymous';}catch(e){}
+    img.onload=function(){handleImageLoaded(img,id,data);imageUrlInput.value='';};
+    img.onerror=function(){urlErrorTip.textContent='画像の読み込みに失敗しました！';urlErrorTip.style.display='block';removeImage(id);data.cardElement.parentNode.removeChild(data.cardElement);img=null;};
+    img.src=url;
+}
+function handleFileSelect(e){
+    var files=e.target.files;
+    if(!files.length)return;
+    Array.from(files).forEach(function(file){
+        var reader=new FileReader();
+        var id=imageIdCounter++;
+        var data=createCanvasPair(id);
+        data.file=file;
+        createImageCard(id,data,'ファイル：'+file.name);
+        reader.onload=function(e){
+            var img=new Image();
+            img.onload=function(){handleImageLoaded(img,id,data);};
+            img.onerror=function(){showToast(file.name+'の読み込みに失敗しました','error');removeImage(id);data.cardElement.parentNode.removeChild(data.cardElement);img=null;};
+            img.src=e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+function handleViewerWheel(e){
+    e.preventDefault();
+    var scaleStep=0.1;
+    viewerState.scale+=(e.deltaY<0?scaleStep:-scaleStep);
+    viewerState.scale=Math.max(0.5,viewerState.scale);
+    viewerImg.style.transform='translate('+viewerState.offsetX+'px, '+viewerState.offsetY+'px) scale('+viewerState.scale+')';
+}
+function handleViewerMouseDown(e){
+    viewerState.isDragging=true;
+    viewerState.startX=e.clientX-viewerState.offsetX;
+    viewerState.startY=e.clientY-viewerState.offsetY;
+    viewerContent.classList.add('dragging');
+}
+function handleViewerMouseMove(e){
+    updateCrossAndCoord(e.clientX,e.clientY);
+    if(!viewerState.isDragging)return;
+    viewerState.offsetX=e.clientX-viewerState.startX;
+    viewerState.offsetY=e.clientY-viewerState.startY;
+    viewerImg.style.transform='translate('+viewerState.offsetX+'px, '+viewerState.offsetY+'px) scale('+viewerState.scale+')';
+}
+function handleViewerMouseUp(){
+    viewerState.isDragging=false;
+    viewerContent.classList.remove('dragging');
+}
+function getTouchDistance(touches){
+    var dx=touches[0].clientX-touches[1].clientX;
+    var dy=touches[0].clientY-touches[1].clientY;
+    return Math.sqrt(dx*dx+dy*dy);
+}
+function handleViewerTouch(e){
+    e.preventDefault();
+    var touches=e.touches;
+    if(touches.length===1){
+        var touch=touches[0];
+        updateCrossAndCoord(touch.clientX,touch.clientY);
+        if(e.type==='touchstart'){
+            viewerState.isDragging=true;
+            viewerState.startX=touch.clientX-viewerState.offsetX;
+            viewerState.startY=touch.clientY-viewerState.offsetY;
+        }
+        if(e.type==='touchmove'&&viewerState.isDragging){
+            viewerState.offsetX=touch.clientX-viewerState.startX;
+            viewerState.offsetY=touch.clientY-viewerState.startY;
+            viewerImg.style.transform='translate('+viewerState.offsetX+'px, '+viewerState.offsetY+'px) scale('+viewerState.scale+')';
+        }
+    }
+    if(touches.length===2){
+        if(e.type==='touchstart'){viewerState.lastTouchDistance=getTouchDistance(touches);}
+        if(e.type==='touchmove'){
+            var distance=getTouchDistance(touches);
+            var scale=distance/viewerState.lastTouchDistance;
+            viewerState.scale*=scale;
+            viewerState.scale=Math.max(0.5,viewerState.scale);
+            viewerState.lastTouchDistance=distance;
+            viewerImg.style.transform='translate('+viewerState.offsetX+'px, '+viewerState.offsetY+'px) scale('+viewerState.scale+')';
+        }
+    }
+    if(e.type==='touchend'){viewerState.isDragging=false;}
+}
+addEvent(imageFile,'change',handleFileSelect);
+addEvent(encryptBtn,'click',function(){batchProcessImages(false);});
+addEvent(decryptBtn,'click',function(){batchProcessImages(true);});
+addEvent(clearAllBtn,'click',clearAllImages);
+addEvent(batchDownloadBtn,'click',batchDownloadImages);
+addEvent(loadUrlBtn,'click',loadImageFromUrl);
+addEvent(viewerCloseBtn,'click',closeImageViewer);
+addEvent(imageViewer,'click',function(e){if(e.target===imageViewer)closeImageViewer();});
+viewerContent=document.querySelector('.viewer-content');
+pixelCoord=document.getElementById('pixelCoord');
+horizontalLine=document.getElementById('horizontalLine');
+verticalLine=document.getElementById('verticalLine');
+addEvent(viewerContent,'wheel',handleViewerWheel);
+addEvent(viewerContent,'mousedown',handleViewerMouseDown);
+addEvent(document,'mousemove',handleViewerMouseMove);
+addEvent(document,'mouseup',handleViewerMouseUp);
+addEvent(viewerContent,'touchstart',handleViewerTouch);
+addEvent(viewerContent, 'touchmove', handleViewerTouch);
+addEvent(viewerContent, 'touchend', handleViewerTouch);
+addEvent(window, 'popstate', function(e) {if (imageViewer.classList.contains('show')) closeImageViewer();});
+addEvent(document, 'keydown', function(e) {if (e.keyCode === 27 && imageViewer.classList.contains('show')) closeImageViewer();});
+</script>
+</body>
+</html>
