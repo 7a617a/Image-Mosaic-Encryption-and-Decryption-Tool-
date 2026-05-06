@@ -35,7 +35,7 @@
         .image-pair {display: flex;flex-wrap: wrap;}
         .image-box {flex: 1;min-width: 200px;width: 100%;position: relative;}
         .image-box h3 {margin-bottom: 4px;color: #567;font-size: 16px;}
-        .preview-img {max-width: 100%;border: 1px solid #ddd;max-height: 478px;object-fit: contain;cursor: zoom-in;transition: all 0.2s ease;display: block;}
+        .preview-img {max-width: 100%;border: 1px solid #ddd;max-height: 462px;object-fit: contain;cursor: zoom-in;transition: all 0.2s ease;display: block;}
         .preview-img:hover {box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);}
         .tip {color: #999;font-size: 12px;margin-top: 4px;}
         .file-name {font-size: 14px;color: #333;margin-bottom: 4px;word-break: break-all;}
@@ -441,8 +441,8 @@ function processSingleImage(imageId, isDecrypt) {
     pImg.style.display = 'block';
     pImg.nextElementSibling.textContent = isDecrypt ? (useLocal ? '局部已解密' : '已解密') : (useLocal ? '局部已加密' : '已加密');
     document.getElementById('singleDownloadBtn_' + imageId).disabled = false;
-    localImageData = null;
-    newData = null; 
+    localImageData = null;newData = null; 
+    if (crop && useLocal) {setTimeout(function() {drawCardOverlay(imageId);},300);}
     return true;
 }
 // 批量处理
@@ -451,7 +451,9 @@ function batchProcessImages(isDecrypt){
     if(!ids.length){showToast('请加载图片','warning','s_tip');return;}
     var c=0;
     for(var i=0;i<ids.length;i++) if(processSingleImage(+ids[i],isDecrypt)) c++;
-    if(c>0){batchDownloadBtn.disabled=false;showToast('成功处理'+c+'张','success','s_tip');}
+    var er=loadedImageCount-c;
+    if(c==loadedImageCount){batchDownloadBtn.disabled=false;showToast('成功处理'+c+'张','success','s_tip');}
+    else if(c>0){batchDownloadBtn.disabled=false;showToast('成功处理'+c+'张,失败'+er+'张','warning','s_tip');}
 }
 // 文件名处理
 function sanitizeFileName(name) {return name.replace(/[\\/:*?"<>|]/g, '_').trim();}
@@ -740,6 +742,7 @@ function openImageViewer(src, imageId, isProcessed) {
     imageViewer.classList.add('show');
     document.body.style.overflow = 'hidden';
     history.pushState({viewer: true}, '');
+    drawCardOverlay(imageId);
 }
 function closeImageViewer() {
     imageViewer.classList.remove('show');
