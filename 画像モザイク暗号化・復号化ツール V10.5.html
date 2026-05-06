@@ -385,8 +385,8 @@ function processSingleImage(imageId,isDecrypt){
     var crop=useLocal?d.localCrop:false;
     var processWidth=lu2-lu1;
     var processHeight=lv2-lv1;
-    if(bc>d.originalImageData.width||bc>d.originalImageData.height){showToast('ブロック数は画像の幅または高さを超えることはできません','error');return false;}
-    if(processWidth<bc||processHeight<bc){showToast('ブロック数は領域の幅または高さを超えることはできません','error');return false;}
+    if(bc>d.originalImageData.width||bc>d.originalImageData.height){showToast('ブロック数は画像の幅または高さを超えることはできません','error','BCcheck');return false;}
+    if(processWidth<bc||processHeight<bc){showToast('ブロック数は領域の幅または高さを超えることはできません','error','BCcheck');return false;}
     var validProcessW=Math.floor(processWidth/bc)*bc;
     var validProcessH=Math.floor(processHeight/bc)*bc;
     var offsetX=lu1;var offsetY=lv1;
@@ -591,7 +591,7 @@ function clearAllImages(){
     resetFileInput();
     updateFileCount();
     batchDownloadBtn.disabled=true;
-    showToast('すべての画像をクリアしました','success','s_tip');
+    showToast('すべての画像をクリアしました','info','s_tip');
 }
 function resetFileInput(){imageFile.value='';}
 function updateFileCount(){fileCount.textContent=loadedImageCount;batchTip.style.display=loadedImageCount>0?'block':'none';}
