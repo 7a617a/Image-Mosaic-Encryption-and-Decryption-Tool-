@@ -35,7 +35,7 @@
         .image-pair {display: flex;flex-wrap: wrap;}
         .image-box {flex: 1;min-width: 200px;width: 100%;position: relative;}
         .image-box h3 {margin-bottom: 4px;color: #567;font-size: 16px;}
-        .preview-img {max-width: 100%;border: 1px solid #ddd;max-height: 478px;object-fit: contain;cursor: zoom-in;transition: all 0.2s ease;display: block;}
+        .preview-img {max-width: 100%;border: 1px solid #ddd;max-height: 462px;object-fit: contain;cursor: zoom-in;transition: all 0.2s ease;display: block;}
         .preview-img:hover {box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);}
         .tip {color: #999;font-size: 12px;margin-top: 4px;}
         .file-name {font-size: 14px;color: #333;margin-bottom: 4px;word-break: break-all;}
@@ -433,6 +433,7 @@ function processSingleImage(imageId, isDecrypt) {
     pImg.nextElementSibling.textContent = isDecrypt ? (useLocal ? 'Locally Decrypted' : 'Decrypted') : (useLocal ? 'Locally Encrypted' : 'Encrypted');
     document.getElementById('singleDownloadBtn_' + imageId).disabled = false;
     localImageData = null;newData = null; 
+    if (crop && useLocal) {setTimeout(function() {drawCardOverlay(imageId);},300);}
     return true;
 }
 function batchProcessImages(isDecrypt){
@@ -440,7 +441,9 @@ function batchProcessImages(isDecrypt){
     if(!ids.length){showToast('Please load images','warning','s_tip');return;}
     var c=0;
     for(var i=0;i<ids.length;i++) if(processSingleImage(+ids[i],isDecrypt)) c++;
-    if(c>0){batchDownloadBtn.disabled=false;showToast('Successfully processed '+c+' images','success','s_tip');}
+    var er=loadedImageCount-c;
+    if(c==loadedImageCount){batchDownloadBtn.disabled=false;showToast('Successfully processed '+c+' images','success','s_tip');}
+    else if(c>0){batchDownloadBtn.disabled=false;showToast('Successfully processed '+c+' images, failed '+er+' images','warning','s_tip');}
 }
 function sanitizeFileName(name) {return name.replace(/[\\/:*?"<>|]/g, '_').trim();}
 function generateProcessedFileName(originalName, blockCount, secretKey, isEncrypt, localCoords) {
@@ -716,6 +719,7 @@ function openImageViewer(src, imageId, isProcessed) {
     imageViewer.classList.add('show');
     document.body.style.overflow = 'hidden';
     history.pushState({viewer: true}, '');
+    drawCardOverlay(imageId);
 }
 function closeImageViewer() {
     imageViewer.classList.remove('show');
