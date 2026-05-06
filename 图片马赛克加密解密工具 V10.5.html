@@ -396,8 +396,8 @@ function processSingleImage(imageId, isDecrypt) {
     var crop = useLocal ? d.localCrop : false;
     var processWidth = lu2 - lu1;
     var processHeight = lv2 - lv1;
-    if(bc>d.originalImageData.width||bc>d.originalImageData.height){showToast('块数不能大于图像宽或高','error');return false;}
-    if (processWidth<bc||processHeight<bc) { showToast('块数不能大于区域宽或高', 'error'); return false; }
+    if(bc>d.originalImageData.width||bc>d.originalImageData.height){showToast('块数不能大于图像宽或高','error','BCcheck');return false;}
+    if (processWidth<bc||processHeight<bc) { showToast('块数不能大于区域宽或高', 'error','BCcheck'); return false; }
     var validProcessW = Math.floor(processWidth / bc) * bc;
     var validProcessH = Math.floor(processHeight / bc) * bc;
     var offsetX = lu1; var offsetY = lv1;
@@ -611,7 +611,7 @@ function clearAllImages() {
     resetFileInput();
     updateFileCount();
     batchDownloadBtn.disabled = true;
-    showToast('已清空所有图片', 'success','s_tip');
+    showToast('已清空所有图片', 'info','s_tip');
 }
 function resetFileInput(){imageFile.value='';}
 function updateFileCount(){fileCount.textContent=loadedImageCount;batchTip.style.display=loadedImageCount>0?'block':'none';}
