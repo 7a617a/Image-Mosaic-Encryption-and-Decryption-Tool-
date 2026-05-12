@@ -2,13 +2,13 @@
 
 This is an image encryption/decryption tool built with HTML + JS. It is a single-file application that requires no installation, no environment configuration, and no internet connection. All functions can be run directly in a browser, with cross-platform support for both desktop and mobile browsers.
 
-The tool encrypts/decrypts images by splitting them into blocks of up to the maximum pixel count. Based on a set password, the blocks are shuffled, flipped, and reassembled into a new image with the same dimensions, aspect ratio, and pixel count as the original.
-
 The encryption/decryption process is completely lossless. The decrypted content remains unaffected by changes to the filename, image format, moderate image scaling, or watermarking.
 
 Unlike ordinary encryption tools, the encrypted output is still a valid image with no MIME type restrictions. It enhances the privacy and security of image-based information shared online, making it ideal for social media platforms that allow free image uploads. It effectively defends against unauthorized third-party surveillance and censorship, protecting users’ freedom of information exchange and privacy.
 
 It supports local encryption of specific image areas, replacing traditional unrecoverable image censorship methods.
+
+The tool encrypts/decrypts images by splitting them into blocks of up to the maximum pixel count. Based on a set password, the blocks are shuffled, flipped, and reassembled into a new image with the same dimensions, aspect ratio, and pixel count as the original.
 
 The tool runs on both desktop and mobile platforms, and is compatible with legacy browsers including Internet Explorer.
 
@@ -25,11 +25,11 @@ Important Notice:Any losses, disputes, controversies, or legal liabilities arisi
 
 通过把图片分割成最多像素数目的块数,根据密码设定的不同将分割后的块按序打乱后翻转并重新拼接成与原图片尺寸,宽高比,像素数相等的新图片作为加密/解密的方法.
 
-加密/解密的过程图片信息完全无损失,解密内容不受文件名变化,图片格式变化,一定程度的图片缩放及水印标记的影响.
-
 不同于普通的加密工具,加密后的图片仍为图片,不受MIME类型限制.可用于增加在网络上传播图片信息的隐私与安全性,尤其适合在允许用户免费上传图片内容的各大社交媒体平台上使用,可有效对抗不友善的第三方的窥视与审查,保护用户信息传递的自由与隐私.
 
 可仅对图片局部特定区域加密,替代传统的不可恢复的各类图片修正.
+
+加密/解密的过程图片信息完全无损失,解密内容不受文件名变化,图片格式变化,一定程度的图片缩放及水印标记的影响.
 
 支持pc,移动端多平台运行,兼容包括IE在内的老旧浏览器.
 
@@ -46,11 +46,11 @@ Important Notice:Any losses, disputes, controversies, or legal liabilities arisi
 
 画像を最大限のピクセル数のブロックに分割し、設定したパスワードに基づいて分割後のブロックをシャッフル・反転させ、元画像と同一のサイズ・縦横比・ピクセル数の新しい画像に再合成する方式で暗号化 / 復号を行います。
 
-暗号化 / 復号の過程で画像情報は完全に損なわれず、復号結果はファイル名の変更、画像フォーマットの変更、一定範囲の拡大縮小、透かしの影響を受けません。
-
 通常の暗号化ツールと異なり、暗号化後のファイルは依然として画像形式であり、MIME タイプの制限を受けません。ネット上での画像情報伝達のプライバシーと安全性を高める用途に適し、特に無料で画像投稿が可能な各種ソーシャルメディアプラットフォームで有効です。悪意のある第三者の覗き見や検閲に対抗し、ユーザーの情報伝達の自由とプライバシーを保護します。
 
 画像の特定の局部領域のみを暗号化でき、従来の回復不可能な画像修正処理に代わります。
+
+暗号化 / 復号の過程で画像情報は完全に損なわれず、復号結果はファイル名の変更、画像フォーマットの変更、一定範囲の拡大縮小、透かしの影響を受けません。
 
 PC・モバイルのマルチプラットフォームで動作し、IE を含む旧式ブラウザにも対応します。
 
